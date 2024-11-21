@@ -5,7 +5,16 @@ export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 
 	theme: {
-		extend: {}
+		colors: {
+			white: '#fff'
+			// Add our application colors here
+		},
+
+		extend: {
+			fontFamily: {
+				custom: ['Bauhaus93', 'sans-serif']
+			}
+		}
 	},
 
 	plugins: [typography]

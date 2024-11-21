@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { Header } from '$lib/components';
+
 	// Applies styles to the whole app
 	import '../app.css';
 
 	let { children } = $props();
 </script>
 
-<!-- Render all the children, i.e. +page.svelte -->
+<Header></Header>
+<!-- Render all the children, i.e. nested routes -->
 {@render children()}
 
 <style lang="postcss">
