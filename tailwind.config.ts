@@ -5,14 +5,15 @@ export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 
 	theme: {
-		colors: {
-			white: '#fff'
-			// Add our application colors here
-		},
-
 		extend: {
+			colors: {
+				white: '#fff',
+				green: '#0909'
+				// Add our application colors here
+			},
 			fontFamily: {
-				custom: ['Bauhaus93', 'sans-serif']
+				bauhaus93: ['Bauhaus93', 'sans-serif'],
+				roboto: ['Roboto', 'sans-serif']
 			}
 		}
 	},
