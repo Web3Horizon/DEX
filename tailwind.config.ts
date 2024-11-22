@@ -8,7 +8,7 @@ export default {
 		extend: {
 			colors: {
 				white: '#fff',
-				green: '#0909'
+				app_pink: '#E018FF'
 				// Add our application colors here
 			},
 			fontFamily: {

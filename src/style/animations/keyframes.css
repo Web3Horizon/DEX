@@ -1,0 +1,21 @@
+@keyframes themeColorCycle {
+	0%,
+	100% {
+		fill: #823fff;
+	}
+	33% {
+		fill: #e018ff;
+	}
+	66% {
+		fill: #6f00ff;
+	}
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}

@@ -1,75 +1,85 @@
 <script lang="ts">
+	import { Logo, Swap, Liquidity } from '$lib/assets/icons';
+	import { LiquidityDropDown } from '$lib/components';
+
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+
 	let logoLetters = ['d', 'e', 'x', 'e', 'r'];
+	let navigationComponents = [
+		{
+			icon: {
+				width: 28,
+				height: 24,
+				component: Swap
+			},
+			text: 'swap',
+			onClick: navigateHome,
+			onMouseEnter: null,
+			onMouseLeave: null
+		},
+		{
+			icon: {
+				width: 24,
+				height: 24,
+				component: Liquidity
+			},
+			text: 'liquidity',
+			onClick: null,
+			onMouseEnter: showMenu,
+			onMouseLeave: hideMenu
+		}
+	];
+
+	let showLiquidityMenu = false;
+
+	// Navigate to root if user is not in the root path
+	function navigateHome() {
+		if ($page.url.pathname !== '/') goto('/');
+	}
+
+	// Show dropdown menu with a slight delay for smoother UX
+	function showMenu() {
+		showLiquidityMenu = true;
+	}
+
+	// Hide dropdown menu with a slight delay
+	function hideMenu() {
+		setTimeout(() => {
+			showLiquidityMenu = false;
+		}, 200); // Adjust delay as needed
+	}
 </script>
 
 <header class="grid grid-cols-3 items-center px-16 py-6 text-white">
 	<div class="flex items-center gap-x-1.5 justify-self-start">
-		<svg
-			class="animated-svg"
-			width="59"
-			height="77"
-			viewBox="0 0 59 77"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
-				d="M14.9185 0.0999016C11.6143 5.38965 11.1883 12.0353 13.8087 17.8196C14.1471 18.5665 14.5692 19.2632 14.86 19.9384C14.3021 20.5381 11.7893 21.6797 10.8536 22.2143C8.7838 23.3969 5.5912 25.9638 4.02063 27.9514C3.26901 28.9026 2.02696 30.4146 1.52363 31.7475C3.46714 31.1703 4.72239 29.8983 7.15751 29.5596C6.87123 30.3593 5.33058 32.3967 4.75818 33.3264C2.84487 36.4339 0.433082 43.4025 0 46.9226C1.35937 46.4622 2.28596 45.2347 3.86532 44.7762C3.5217 49.7272 3.17588 56.9902 5.28336 61.6579C5.82189 62.8511 6.88237 64.5912 7.9653 65.2355C8.0027 64.2475 7.95137 63.2612 8.02073 62.2649C8.05256 61.8074 8.19995 60.3481 8.44018 59.912C8.5138 59.7781 8.50955 59.7949 8.58038 59.7152C9.09412 62.695 9.57663 65.4466 12.0062 67.5935C12.1917 67.7574 12.6559 68.2478 12.7961 68.4695L9.59056 69.8957C8.50823 70.4414 7.60833 71.086 6.99031 71.9846C5.83083 73.6711 6.78499 75.5748 8.71296 76.4168C9.29681 76.6716 9.90075 76.824 10.5735 76.9083C14.0154 77.34 19.5661 76.2599 20.9981 73.4077C21.5428 72.3229 21.6833 70.9023 21.8612 69.5992C22.4042 69.7009 23.0253 69.9303 23.5589 70.0812C24.1445 70.2466 24.7857 70.364 25.4091 70.4902C26.6721 70.7461 28.1956 70.8499 29.5204 70.8172C32.757 70.7375 36.4729 69.636 37.2353 69.6449C37.3252 72.9231 38.2658 74.4971 40.496 75.6396C43.2034 77.0265 49.79 77.8791 51.8017 75.4472C53.6273 73.2403 51.4167 71.0029 49.3789 69.8713C48.6514 69.4672 46.6213 68.872 46.1859 68.3989C47.8852 66.4444 48.9841 64.8542 49.7495 62.2685C49.9144 61.7117 50.2316 60.0067 50.4022 59.6528C51.1357 60.5677 50.9771 63.791 51.1152 65.2033C51.2827 65.1366 52.3818 63.932 52.5707 63.6517C53.8016 61.8261 54.7727 58.9668 55.0933 56.7436C55.7 52.5349 55.1103 48.9051 55.2158 44.7472C56.5731 45.3607 57.5346 46.3378 59 46.9189C58.5141 43.5065 57.3985 40.4247 56.2122 37.4738C54.6111 33.4909 52.0148 30.0551 51.8252 29.5719C53.9366 29.7561 56.2323 31.4224 57.4781 31.7576C56.3703 29.1613 53.9403 26.6018 51.8231 24.8651C49.3575 22.8429 47.8244 22.0304 45.1038 20.5971L44.2943 20.0871C44.1834 19.996 44.2078 20.0203 44.1353 19.9384C44.4324 19.2328 44.8636 18.5299 45.1927 17.7871C47.6972 12.1369 47.3625 6.51713 44.6546 1.04129C44.4267 0.58063 44.1145 0.350947 44.0327 0L43.9357 0.152448C43.6365 0.781294 44.069 -0.314855 43.8677 0.311681C43.8556 0.349215 43.8241 0.586405 43.8188 0.637798C43.2816 5.86937 41.9859 7.32209 41.6943 9.46026C42.0536 9.72357 42.1864 9.9254 42.5788 10.1545C42.876 10.3277 43.3083 10.4467 43.5801 10.6372C42.9141 11.0508 41.9745 10.3019 41.2987 10.1432C41.0485 10.7247 39.3204 12.9813 39.1555 13.5574C39.3862 13.691 39.7378 14.1515 40.3364 14.5922C40.7911 14.9269 41.4548 15.2245 41.7436 15.4994C40.1767 15.391 39.432 14.4998 38.496 14.1363C37.6212 14.6905 36.192 16.4183 34.8149 16.4232C33.0886 16.4294 31.2413 15.8327 29.4262 15.8502C27.7636 15.8662 25.4005 16.5423 24.034 16.4229C23.0547 16.3373 21.2797 14.8161 20.4767 14.1207C19.7703 14.5798 18.3436 15.4707 17.2426 15.4906C17.6368 15.066 19.3488 14.4084 19.8101 13.4276L17.6012 10.1328L15.2401 10.9971C15.7891 10.4577 16.6724 9.9329 17.2972 9.39298C17.0349 7.95874 16.2531 6.46573 15.9165 4.96017C15.7303 4.12647 15.6233 3.26665 15.4903 2.40567C15.4237 1.97431 15.3523 1.52693 15.2778 1.12199C15.2406 0.919307 15.1972 0.688469 15.1445 0.50686C14.9855 -0.0412863 14.9192 0.100768 14.9182 0.100046L14.9185 0.0999016ZM28.4325 23.3644C21.7956 24.0955 16.2288 29.433 16.9345 36.7769C17.556 43.2457 23.243 48.7878 30.6281 48.0706C37.2204 47.4306 42.7594 41.8829 42.0525 34.5454C41.4447 28.2364 35.6954 22.5645 28.4325 23.3644ZM23.2827 40.4956C24.2083 40.3388 24.8322 39.4084 26.0081 40.1354C27.3494 40.9649 26.711 41.9181 26.8839 42.9129C28.702 44.0043 31.8134 43.4384 33.7482 42.1453C34.4022 41.7084 34.824 41.1879 35.3279 40.7248C36.1603 39.9597 36.9851 38.2709 37.2886 36.7974C37.7291 34.658 37.0994 33.5205 36.335 32.0349C35.0251 32.3961 34.0957 32.803 33.1069 31.8455C31.837 30.6157 32.7835 29.9555 32.781 28.6305C30.7513 28.2147 29.3159 27.9005 27.1806 28.4268C21.9836 29.7082 20.0395 35.7846 23.2827 40.4957V40.4956ZM18.6532 53.5212C18.9981 53.3492 19.431 52.8295 19.7569 52.7068C19.9297 55.532 19.9099 58.2886 22.1398 60.5948C24.0477 62.5681 26.3825 63.6846 29.4248 63.6726C34.862 63.6513 38.5091 59.9961 39.0252 55.1779C39.1054 54.4291 39.0758 53.4162 39.2072 52.7293C39.5652 52.9782 40.0016 53.2752 40.3694 53.4874C40.1654 52.6213 39.0197 51.854 37.8231 51.8324C38.2383 52.2092 38.5038 52.1227 38.7694 52.6795C38.398 52.9848 35.371 54.0653 34.708 54.2558C32.2795 54.9535 26.8314 54.8733 24.3759 54.2082C23.5539 53.9856 20.7627 53.0446 20.246 52.6795C20.371 52.3967 20.3111 52.4927 20.5873 52.2599L20.9001 51.9947C21.0254 51.8754 20.9604 51.9551 21.0664 51.8243C19.8141 51.9355 18.9457 52.5665 18.6532 53.5213V53.5212Z"
-			/>
-		</svg>
+		<Logo class="theme-color-cycle" width="59" height="77" />
 		<h1 class=" font-bauhaus93 text-5xl uppercase">
 			{#each logoLetters as letter, index}
-				<span class="fade-letter inline-block" style="animation-delay: {index * 0.075}s">
+				<span class="fade-in inline-block" style="animation-delay: {index * 0.075}s">
 					{letter}
 				</span>
 			{/each}
 		</h1>
 	</div>
 
-	<div
-		class="grid grid-cols-2 gap-x-24 rounded-3xl bg-[#50259D73] px-16 py-4 font-roboto font-bold"
-	>
-		<button class="text-xl transition duration-300 ease-out hover:text-green">Swap</button>
-		<button class="text-xl">Liquidity</button>
+	<div class="flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
+		{#each navigationComponents as navComponent}
+			<button
+				class="flex items-center gap-x-2 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
+				onclick={navComponent.onClick}
+				onmouseenter={navComponent.onMouseEnter}
+				onmouseleave={navComponent.onMouseLeave}
+			>
+				<svelte:component
+					this={navComponent.icon.component}
+					width={navComponent.icon.width}
+					height={navComponent.icon.height}
+				/>
+				<span class="capitalize">{navComponent.text}</span>
+			</button>
+		{/each}
 	</div>
 
 	<div class="justify-self-end">RIGHT</div>
 </header>
-
-<style>
-	/* Logo animation */
-	@keyframes colorCycle {
-		0%,
-		100% {
-			fill: #823fff;
-		}
-		33% {
-			fill: #e018ff;
-		}
-		66% {
-			fill: #6f00ff;
-		}
-	}
-
-	/* Apply logo animation to the SVG path */
-	.animated-svg path {
-		animation: colorCycle 10s infinite;
-	}
-
-	/* Logo name animation */
-	@keyframes fadeIn {
-		0% {
-			opacity: 0;
-		}
-		100% {
-			opacity: 1;
-		}
-	}
-
-	/* Apply fade-in animation to each letter */
-	.fade-letter {
-		opacity: 0; /* Ensure letters are hidden initially */
-		animation: fadeIn 0.3s ease-out forwards;
-	}
-</style>
