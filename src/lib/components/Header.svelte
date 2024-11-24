@@ -63,10 +63,10 @@
 		</h1>
 	</div>
 
-	<div class="flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
+	<div class="font-roboto flex justify-around rounded-3xl bg-[#50259D73] py-4 font-bold">
 		{#each navigationComponents as navComponent}
 			<button
-				class="flex items-center gap-x-2 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
+				class="hover:stroke-app_pink hover:text-app_pink flex items-center gap-x-2 stroke-white text-xl transition duration-300 ease-out"
 				onclick={navComponent.onClick}
 				onmouseenter={navComponent.onMouseEnter}
 				onmouseleave={navComponent.onMouseLeave}

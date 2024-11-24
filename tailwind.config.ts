@@ -8,7 +8,10 @@ export default {
 		extend: {
 			colors: {
 				white: '#fff',
-				app_pink: '#E018FF'
+				app_pink: '#E018FF',
+				deep_dark_purple:'#1E0447',
+				dark_purple:'#823FFF',
+				
 				// Add our application colors here
 			},
 			fontFamily: {
