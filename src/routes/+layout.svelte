@@ -3,6 +3,7 @@
 
 	// Applies styles to the whole app
 	import '../app.css';
+	import 'iconify-icon';
 
 	let { children } = $props();
 </script>
