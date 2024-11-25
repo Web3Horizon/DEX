@@ -89,7 +89,7 @@
 	}
 </script>
 
-<header class="grid grid-cols-3 items-center px-16 py-6 text-white">
+<header class="grid grid-cols-3 items-center px-16 py-6 text-white backdrop-blur-sm">
 	<a href="/">
 		<div class="flex items-center gap-x-1.5 justify-self-start">
 			<Logo class="theme-color-cycle" width="59" height="77" />

@@ -9,6 +9,9 @@ export default {
 			colors: {
 				white: '#fff',
 				app_pink: '#E018FF',
+				deep_dark_purple: '#1E0447',
+				dark_purple: '#823FFF',
+
 				app_green: '#80FF77'
 				// Add our application colors here
 			},
