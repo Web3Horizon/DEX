@@ -1,3 +1,13 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+@import './style/typography/fonts.css';
+
+@import './style/animations/globals.css';
+@import './style/animations/keyframes.css';
+
+/* NOTE: TEMPORARY */
+html {
+	background-color: #1e0447;
+}
