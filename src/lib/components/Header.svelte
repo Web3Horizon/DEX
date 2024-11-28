@@ -32,7 +32,7 @@
 	const liquidityDropDownItems = [
 		{
 			text: 'add liquidity',
-			href: '/',
+			href: '/addliquidity',
 			icon: {
 				width: 24,
 				height: 23,
@@ -42,7 +42,7 @@
 		},
 		{
 			text: 'your liquidity',
-			href: '/yourliquidity',
+			href: '/',
 			icon: {
 				width: 24,
 				height: 23,
@@ -104,13 +104,13 @@
 		</div>
 	</a>
 
-	<div class="flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
+	<div class="font-roboto flex justify-around rounded-3xl bg-[#50259D73] py-4 font-bold">
 		{#each navigationComponents as navComponent}
 			{#if navComponent.text === 'liquidity'}
 				<div class="relative">
 					<button
 						bind:this={buttonElement}
-						class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
+						class="hover:stroke-app_pink hover:text-app_pink flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out"
 						onclick={navComponent.onClick}
 					>
 						<navComponent.icon.component
@@ -139,7 +139,7 @@
 				</div>
 			{:else}
 				<button
-					class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
+					class="hover:stroke-app_pink hover:text-app_pink flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out"
 					onclick={navComponent.onClick}
 				>
 					<navComponent.icon.component
