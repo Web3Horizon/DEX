@@ -15,11 +15,13 @@
 
 	const connect = async () => {
 		isConnecting = true;
-		await connectWallet();
+		let result = await connectWallet();
 		isConnecting = false;
 
-		// Show the success message
-		isModalOpen = true;
+		if (result === null) {
+			// Show the success message
+			isModalOpen = true;
+		}
 	};
 
 	onMount(async () => {

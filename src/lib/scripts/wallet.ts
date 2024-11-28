@@ -1,10 +1,10 @@
 import { ethers } from 'ethers';
 import { walletConnected } from '$lib/stores/wallet';
+import { newAppError, type AppError } from '$lib/types/AppError';
 
-export async function connectWallet(): Promise<void> {
+export async function connectWallet(): Promise<null | AppError> {
 	if (!window.ethereum) {
-		alert('MetaMask is required to connect a wallet.');
-		return;
+		return newAppError('MetaMask is required to connect a wallet', null);
 	}
 
 	try {
@@ -19,7 +19,7 @@ export async function connectWallet(): Promise<void> {
 			if (address === previouslyConnectedAddress) {
 				setupAccountChangeListener();
 				walletConnected.set(true);
-				return;
+				return null;
 			}
 		}
 
@@ -34,9 +34,15 @@ export async function connectWallet(): Promise<void> {
 		walletConnected.set(true);
 
 		// Set up listener for account changes
-		setupAccountChangeListener();
-	} catch (error) {
-		console.error('Error connecting wallet:', error);
+		let listenerSetupResult = setupAccountChangeListener();
+
+		if (listenerSetupResult != null) {
+			return listenerSetupResult;
+		}
+
+		return null;
+	} catch (err: any) {
+		return newAppError('Error connecting wallet', err.toString());
 	}
 }
 
@@ -46,10 +52,9 @@ export function disconnectWallet(): void {
 }
 
 // Listen for account changes
-function setupAccountChangeListener(): void {
+function setupAccountChangeListener(): null | AppError {
 	if (!window.ethereum) {
-		alert('MetaMask is required to setup an account listener.');
-		return;
+		return newAppError('MetaMask is required to setup an account listener', null);
 	}
 
 	window.ethereum.on('accountsChanged', (accounts: string[] | unknown) => {
@@ -58,14 +63,18 @@ function setupAccountChangeListener(): void {
 			if (accounts.length === 0) {
 				// No accounts connected
 				disconnectWallet();
+				return;
 			} else {
 				// Update to new account
 				const newAddress = accounts[0];
 				localStorage.setItem('connectedWalletAddress', newAddress);
 				walletConnected.set(true);
+				return;
 			}
 		} else {
 			console.error('Unexpected accountsChanged parameter:', accounts);
 		}
 	});
+
+	return null;
 }
