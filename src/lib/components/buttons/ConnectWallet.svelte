@@ -9,7 +9,7 @@
 	import { Modal } from '$lib/components';
 
 	let isConnecting = $state(false);
-	let isModalOpen = $state(true);
+	let isModalOpen = $state(false);
 	const walletIconWidth = 24;
 	const walletIconHeight = 25;
 
@@ -21,10 +21,6 @@
 		// Show the success message
 		isModalOpen = true;
 	};
-
-	function toggle() {
-		isModalOpen = !isModalOpen;
-	}
 
 	onMount(async () => {
 		// Check if a wallet connection exists in localStorage
@@ -50,7 +46,7 @@
 		class="flex items-center gap-2.5 rounded-full bg-[#6F00FF] stroke-white px-2.5 py-2.5 font-roboto text-base font-bold transition-all duration-300 hover:bg-[#9747FF] hover:shadow-wallet"
 		disabled={isConnecting}
 		class:cursor-not-allowed={isConnecting}
-		onclick={toggle}
+		onclick={connect}
 	>
 		<span class="capitalize">
 			{#if isConnecting}
