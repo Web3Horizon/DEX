@@ -9,7 +9,6 @@
 
 <Header></Header>
 <Background></Background>
-<SwappingCard></SwappingCard>
 
 <!-- Render all the children, i.e. nested routes -->
 {@render children()}
