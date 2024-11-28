@@ -42,7 +42,7 @@
 		},
 		{
 			text: 'your liquidity',
-			href: '/',
+			href: '/yourliquidity',
 			icon: {
 				width: 24,
 				height: 23,
