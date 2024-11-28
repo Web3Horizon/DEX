@@ -8,8 +8,8 @@
 	import { Logo, Swap, Liquidity, AddLiquidity, YourLiquidity, Wallet } from '$lib/assets/icons';
 	import { ConnectWallet } from '$lib/components';
 
-	let logoLetters = ['d', 'e', 'x', 'e', 'r'];
-	let navigationComponents = [
+	const logoLetters = ['d', 'e', 'x', 'e', 'r'];
+	const navigationComponents = [
 		{
 			icon: {
 				width: 28,
@@ -29,7 +29,7 @@
 			onClick: toggleLiquidityDropDown
 		}
 	];
-	let liquidityDropDownItems = [
+	const liquidityDropDownItems = [
 		{
 			text: 'add liquidity',
 			href: '/',
@@ -51,11 +51,12 @@
 			onClick: toggleLiquidityDropDown
 		}
 	];
-	let showLiquidityDropDown = false;
+	let showLiquidityDropDown = $state(false);
 
-	let dropdownElement: HTMLDivElement | null = null;
-	let buttonElement: HTMLButtonElement | null = null;
+	let dropdownElement: HTMLDivElement | null = $state(null);
+	let buttonElement: HTMLButtonElement | null = $state(null);
 
+	// Navigate user to "/" if he is not yet in "/"
 	function navigateHome() {
 		if ($page.url.pathname !== '/') goto('/');
 	}
@@ -112,8 +113,7 @@
 						class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
 						onclick={navComponent.onClick}
 					>
-						<svelte:component
-							this={navComponent.icon.component}
+						<navComponent.icon.component
 							width={navComponent.icon.width}
 							height={navComponent.icon.height}
 						/>
@@ -130,11 +130,7 @@
 									class="flex gap-2.5 rounded-full px-2 py-1.5 transition-all duration-300 hover:bg-[#AC8DE2]"
 									onclick={item.onClick}
 								>
-									<svelte:component
-										this={item.icon.component}
-										width={item.icon.width}
-										height={item.icon.height}
-									/>
+									<item.icon.component width={item.icon.width} height={item.icon.height} />
 									<a href={item.href} class="capitalize">{item.text}</a>
 								</button>
 							{/each}
@@ -146,8 +142,7 @@
 					class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
 					onclick={navComponent.onClick}
 				>
-					<svelte:component
-						this={navComponent.icon.component}
+					<navComponent.icon.component
 						width={navComponent.icon.width}
 						height={navComponent.icon.height}
 					/>

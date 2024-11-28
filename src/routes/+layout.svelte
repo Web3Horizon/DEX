@@ -3,6 +3,7 @@
 
 	// Applies styles to the whole app
 	import '../app.css';
+	import 'iconify-icon';
 
 	let { children } = $props();
 </script>
@@ -11,6 +12,3 @@
 <Background></Background>
 <!-- Render all the children, i.e. nested routes -->
 {@render children()}
-
-<style lang="postcss">
-</style>
