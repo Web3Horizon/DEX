@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Header, Background } from '$lib/components';
+	import { Header, Background, SwappingCard } from '$lib/components';
 
 	// Applies styles to the whole app
 	import '../app.css';
@@ -9,6 +9,8 @@
 
 <Header></Header>
 <Background></Background>
+<SwappingCard></SwappingCard>
+
 <!-- Render all the children, i.e. nested routes -->
 {@render children()}
 
