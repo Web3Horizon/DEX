@@ -38,14 +38,14 @@
 
 {#if $walletConnected}
 	<div
-		class="flex items-center gap-2.5 rounded-full bg-[#34136E] stroke-app_green px-2.5 py-2.5 font-roboto text-base font-bold text-app_green"
+		class="stroke-app_green font-roboto text-app_green flex items-center gap-2.5 rounded-full bg-[#34136E] px-2.5 py-2.5 text-base font-bold"
 	>
 		<span>Connected</span>
 		<Wallet width={walletIconWidth} height={walletIconHeight} />
 	</div>
 {:else}
 	<button
-		class="flex items-center gap-2.5 rounded-full bg-[#6F00FF] stroke-white px-2.5 py-2.5 font-roboto text-base font-bold transition-all duration-300 hover:bg-[#9747FF] hover:shadow-wallet"
+		class="font-roboto hover:shadow-wallet flex items-center gap-2.5 rounded-full bg-[#6F00FF] stroke-white px-2.5 py-2.5 text-base font-bold transition-all duration-300 hover:bg-[#9747FF]"
 		disabled={isConnecting}
 		class:cursor-not-allowed={isConnecting}
 		onclick={connect}
@@ -71,14 +71,14 @@
 {/if}
 
 <Modal bind:isOpen={isModalOpen}>
-	<div class="flex flex-col items-center gap-2">
+	<div class="flex flex-col items-center gap-2 px-[20px]">
 		<img
 			src={walletConnectedImagePath}
 			alt="wallet connected"
 			class="h-auto w-full max-w-[140px]"
 		/>
 		<h2 class="font-roboto text-xl font-bold capitalize text-white">connected successfully</h2>
-		<div class="flex h-12 w-12 justify-center rounded-full border-4 border-app_green">
+		<div class="border-app_green flex h-12 w-12 justify-center rounded-full border-4">
 			<Tick class="stroke-app_green" width="26" />
 		</div>
 	</div>
