@@ -7,6 +7,7 @@
 	import { connectWallet } from '$lib/scripts/wallet';
 	import { walletConnected } from '$lib/stores/wallet';
 	import { Modal } from '$lib/components';
+	import Icon from '@iconify/svelte';
 
 	let isConnecting = $state(false);
 	let isModalOpen = $state(false);
@@ -58,12 +59,12 @@
 			{/if}
 		</span>
 		{#if isConnecting}
-			<iconify-icon
+			<Icon
 				icon="line-md:loading-twotone-loop"
 				width={walletIconWidth}
 				height={walletIconHeight}
-				style="color: white"
-			></iconify-icon>
+				class="text-white"
+			/>
 		{:else}
 			<Wallet width={walletIconWidth} height={walletIconHeight} />
 		{/if}

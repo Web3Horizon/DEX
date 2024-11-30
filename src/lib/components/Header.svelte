@@ -42,7 +42,7 @@
 		},
 		{
 			text: 'your liquidity',
-			href: '/',
+			href: '/your-liquidity',
 			icon: {
 				width: 24,
 				height: 23,
@@ -90,7 +90,7 @@
 	}
 </script>
 
-<header class="grid grid-cols-3 items-center px-16 py-6 text-white backdrop-blur-sm">
+<header class="fixed grid w-full grid-cols-3 items-center px-16 py-6 text-white backdrop-blur-sm">
 	<a href="/">
 		<div class="flex items-center gap-x-1.5 justify-self-start">
 			<Logo class="theme-color-cycle" width="59" height="77" />
@@ -104,13 +104,13 @@
 		</div>
 	</a>
 
-	<div class="flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
+	<div class="font-roboto flex justify-around rounded-3xl bg-[#50259D73] py-4 font-bold">
 		{#each navigationComponents as navComponent}
 			{#if navComponent.text === 'liquidity'}
 				<div class="relative">
 					<button
 						bind:this={buttonElement}
-						class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
+						class="hover:stroke-app_pink hover:text-app_pink flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out"
 						onclick={navComponent.onClick}
 					>
 						<navComponent.icon.component
@@ -139,7 +139,7 @@
 				</div>
 			{:else}
 				<button
-					class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
+					class="hover:stroke-app_pink hover:text-app_pink flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out"
 					onclick={navComponent.onClick}
 				>
 					<navComponent.icon.component

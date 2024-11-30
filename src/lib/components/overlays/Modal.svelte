@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '@iconify/svelte';
 
 	let { isOpen = $bindable(false), children } = $props();
 	let dialog: HTMLDialogElement | null = $state(null);
@@ -38,12 +39,12 @@
 	<div class="flex flex-col rounded-3xl bg-deep_dark_purple p-4">
 		<div class="flex justify-end">
 			<button aria-label="close" class="flex" onclick={close}>
-				<iconify-icon
+				<Icon
 					icon="jam:close"
 					width="24"
 					height="24"
 					class="text-white transition-transform duration-300 hover:scale-125"
-				></iconify-icon>
+				/>
 			</button>
 		</div>
 		<div class="px-20">
