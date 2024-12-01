@@ -1,6 +1,6 @@
 <script lang="ts">
 	import liquidityimage from '$lib/assets/img/liquiditypic.png';
-	import SelectToken from '$lib/components/buttons/SelectToken.svelte';
+	import { SelectToken } from '$lib/components';
 
 	type Token = {
 		name: string;
