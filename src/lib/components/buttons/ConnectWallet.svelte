@@ -46,7 +46,7 @@
 	</div>
 {:else}
 	<button
-		class="flex items-center gap-2.5 rounded-full bg-[#6F00FF] stroke-white px-2.5 py-2.5 font-roboto text-base font-bold transition-all duration-300 hover:bg-[#9747FF] hover:shadow-wallet"
+		class="hover:shadow-app-button flex items-center gap-2.5 rounded-full bg-[#6F00FF] stroke-white px-2.5 py-2.5 font-roboto text-base font-bold transition-all duration-300 hover:bg-[#9747FF] hover:shadow-[#9747FF]"
 		disabled={isConnecting}
 		class:cursor-not-allowed={isConnecting}
 		onclick={connect}
