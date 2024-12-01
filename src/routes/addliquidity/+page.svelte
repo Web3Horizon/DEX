@@ -6,23 +6,65 @@
 		name: string;
 		icon: string;
 	};
+	type Pool = {
+		id: number;
+	};
+	type Share = {
+		id: number;
+	};
 
 	// Token states
 	let selectedTopToken: Token | null = null;
 	let selectedBottomToken: Token | null = null;
+	// let totalPool:
+	// let poolShare:
 </script>
 
-<div class="flex flex-col items-center px-4 sm:px-8 lg:px-16">
+<div class="flex flex-col items-center">
 	<!-- Liquidity Image -->
-	<img src={liquidityimage} alt="liquidity" class="mb-8 h-auto w-full max-w-[200px]" />
+	<img src={liquidityimage} alt="liquidity" class=" h-auto w-full max-w-[200px]" />
 
 	<!-- Main Card Container -->
 	<div
-		class="grid w-full max-w-[1114px] grid-cols-1 gap-4 rounded-[50px] bg-[#5800CA]/30 px-6 py-8 text-white backdrop-blur-[4px] lg:grid-cols-4"
+		class="grid h-[575px] w-full max-w-[1114px] grid-cols-1 gap-3 rounded-[50px] bg-[#5800CA]/30 px-10 py-8 text-white backdrop-blur-[4px] lg:grid-cols-4"
 	>
+		<div
+			class="absolute right-[150px] top-[50px] flex flex-row items-center space-x-[100px] justify-self-end"
+		>
+			<!-- Top Token -->
+			<div class="flex h-[100px] w-[100px] flex-col items-center">
+				{#if selectedTopToken}
+					<img
+						src={selectedTopToken.icon}
+						alt={selectedTopToken.name}
+						class="h-full w-full rounded-full object-cover"
+					/>
+					<!-- Token Name under the logo -->
+					<div class="mt-2 text-sm text-white">{selectedTopToken.name}</div>
+				{:else}
+					<div class="h-full w-full rounded-full"></div>
+				{/if}
+			</div>
+
+			<!-- Bottom Token -->
+			<div class="flex h-[100px] w-[100px] flex-col items-center">
+				{#if selectedBottomToken}
+					<img
+						src={selectedBottomToken.icon}
+						alt={selectedBottomToken.name}
+						class="h-full w-full rounded-full object-cover"
+					/>
+					<!-- Token Name under the logo -->
+					<div class="mt-2 text-sm text-white">{selectedBottomToken.name}</div>
+				{:else}
+					<div class="h-full w-full rounded-full"></div>
+				{/if}
+			</div>
+		</div>
 		<!-- Title -->
 		<h1
-			class="font-roboto col-span-1 mb-6 text-center text-2xl font-bold lg:col-span-4 lg:mb-0 lg:text-left lg:text-4xl"
+			class="font-roboto mb-[20px] text-center text-[35px] font-bold
+		"
 		>
 			Add Liquidity
 		</h1>
@@ -59,6 +101,52 @@
 				</button>
 
 				<div class="font-roboto text-[16px] text-white">Balance: 0</div>
+			</div>
+		</div>
+
+		<div
+			class="absolute right-[200px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 border-fuchsia-600 px-4 py-6"
+		>
+			<h3 class="font-roboto flex items-center text-xl font-bold">Your Pool Data</h3>
+
+			<!-- Your Total Pool Tokens -->
+			<div class="mt-4">
+				<span class="font-roboto">Your total pool tokens:</span>
+
+				<!-- Display Pooled Top Token -->
+				<div class="mt-2 flex items-center space-x-2">
+					{#if selectedTopToken}
+						<span class="font-roboto">Pooled {selectedTopToken.name}:</span>
+						<img
+							src={selectedTopToken.icon}
+							alt={selectedTopToken.name}
+							class="h-6 w-6 rounded-full"
+						/>
+					{:else}
+						<span class="font-roboto">Pooled :</span>
+					{/if}
+				</div>
+
+				<!-- Display Pooled Bottom Token -->
+				<div class="mt-2 flex items-center space-x-2">
+					{#if selectedBottomToken}
+						<span class="font-roboto">Pooled {selectedBottomToken.name}:</span>
+						<img
+							src={selectedBottomToken.icon}
+							alt={selectedBottomToken.name}
+							class="h-6 w-6 rounded-full"
+						/>
+					{:else}
+						<span class="font-roboto">Pooled :</span>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Your Pool Share -->
+			<div class="mt-4 flex items-center justify-between">
+				<span>Your pool share:</span>
+				<span>0.00%</span>
+				<!-- Replace this with dynamic data -->
 			</div>
 		</div>
 
@@ -101,14 +189,14 @@
 		<!-- Get Started Button -->
 		<div class="col-span-1 mt-6 flex justify-center lg:col-span-4">
 			<button
-				class="font-roboto rounded-[25px] bg-[#6F00FF] px-6 py-3 text-base font-bold text-white transition-all duration-300 hover:bg-[#9747FF] hover:shadow-lg"
+				class="font-roboto hover:shadow-approve flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold hover:bg-[#E018FF]"
 			>
-				Get Started
+				Approve
 			</button>
 		</div>
 
 		<!-- Disclaimer -->
-		<div class="col-span-1 mt-6 text-center text-sm text-gray-300 lg:col-span-4 lg:text-base">
+		<div class="font-roboto col-span-1 text-center text-base text-sm text-gray-400 lg:col-span-4">
 			Cryptocurrencies are highly risky and volatile. The value of your holding could fall to zero.
 			Consider your financial circumstances and risk appetite.
 		</div>

@@ -20,7 +20,8 @@ export default {
 				roboto: ['Roboto', 'sans-serif']
 			},
 			boxShadow: {
-				wallet: '0 0 30px 0 #9747FF'
+				wallet: '0 0 30px 0 #9747FF',
+				approve: '0 0 30px 0 #E018FF'
 			}
 		}
 	},
