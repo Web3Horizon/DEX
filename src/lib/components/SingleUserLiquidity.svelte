@@ -3,7 +3,7 @@
 	import { coinImagePaths } from '$lib/constants/coinImagePaths';
 	import type { UserLiquidity } from '$lib/constants/userLiquidity';
 
-	let { ticker1, ticker2 }: UserLiquidity = $props();
+	let { ticker1, ticker2, details }: UserLiquidity = $props();
 
 	const tiker1Image = coinImagePaths[ticker1 as keyof typeof coinImagePaths];
 	const tiker2Image = coinImagePaths[ticker2 as keyof typeof coinImagePaths];
@@ -15,25 +15,25 @@
 	const userLiquidityDetails = [
 		{
 			property: 'Your total pool tokens:',
-			value: '1.1111111',
+			value: details.poolTokens,
 			image: null,
 			ticker: null
 		},
 		{
 			property: `Pooled ${ticker1}:`,
-			value: '1.1',
+			value: details.ticker1Pooled,
 			image: tiker1Image,
 			ticker: ticker1
 		},
 		{
 			property: `Polled ${ticker2}:`,
-			value: '1.1',
+			value: details.ticker2Pooled,
 			image: tiker2Image,
 			ticker: ticker2
 		},
 		{
 			property: 'Your pool share:',
-			value: '1.1%',
+			value: details.poolShare,
 			image: null,
 			ticker: null
 		}
@@ -41,11 +41,13 @@
 	const liquidityControllers = [
 		{
 			title: 'add',
-			href: '/'
+			// WARN: add the actual path
+			href: ''
 		},
 		{
 			title: 'remove',
-			href: '/'
+			// WARN: add the actual path
+			href: ''
 		}
 	];
 </script>
