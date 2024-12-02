@@ -42,7 +42,7 @@
 		},
 		{
 			text: 'your liquidity',
-			href: '/',
+			href: '/your-liquidity',
 			icon: {
 				width: 24,
 				height: 23,
@@ -90,7 +90,9 @@
 	}
 </script>
 
-<header class="grid grid-cols-3 items-center px-16 py-6 text-white backdrop-blur-sm">
+<header
+	class="fixed z-50 grid w-full grid-cols-3 items-center px-16 py-6 text-white backdrop-blur-sm"
+>
 	<a href="/">
 		<div class="flex items-center gap-x-1.5 justify-self-start">
 			<Logo class="theme-color-cycle" width="59" height="77" />

@@ -189,7 +189,7 @@
 		<!-- Get Started Button -->
 		<div class="col-span-1 mt-6 flex justify-center lg:col-span-4">
 			<button
-				class="font-roboto hover:shadow-approve flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold hover:bg-[#E018FF]"
+				class="font-roboto hover:shadow-app-button hover:shadow-app_pink flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold hover:bg-[#E018FF]"
 			>
 				Approve
 			</button>
