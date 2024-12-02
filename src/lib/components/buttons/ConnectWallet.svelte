@@ -7,6 +7,7 @@
 	import { connectWallet } from '$lib/scripts/wallet';
 	import { walletConnected } from '$lib/stores/wallet';
 	import { Modal } from '$lib/components';
+	import Icon from '@iconify/svelte';
 
 	let isConnecting = $state(false);
 	let isModalOpen = $state(false);
@@ -45,7 +46,7 @@
 	</div>
 {:else}
 	<button
-		class="flex items-center gap-2.5 rounded-full bg-[#6F00FF] stroke-white px-2.5 py-2.5 font-roboto text-base font-bold transition-all duration-300 hover:bg-[#9747FF] hover:shadow-wallet"
+		class="hover:shadow-app-button flex items-center gap-2.5 rounded-full bg-[#6F00FF] stroke-white px-2.5 py-2.5 font-roboto text-base font-bold transition-all duration-300 hover:bg-[#9747FF] hover:shadow-[#9747FF]"
 		disabled={isConnecting}
 		class:cursor-not-allowed={isConnecting}
 		onclick={connect}
@@ -58,12 +59,12 @@
 			{/if}
 		</span>
 		{#if isConnecting}
-			<iconify-icon
+			<Icon
 				icon="line-md:loading-twotone-loop"
 				width={walletIconWidth}
 				height={walletIconHeight}
-				style="color: white"
-			></iconify-icon>
+				class="text-white"
+			/>
 		{:else}
 			<Wallet width={walletIconWidth} height={walletIconHeight} />
 		{/if}
