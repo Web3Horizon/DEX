@@ -1,10 +1,40 @@
 <script lang="ts">
-	// NOTE: import is temporary
-	import UNI from '$lib/assets/img/uniswap_coin.png';
+	//**************************************************//
+	//** Imports from library **//
+	//**************************************************//
+	import type { UserLiquidity } from '$lib/constants/userLiquidity';
+	import { coinImagePaths, type CoinImagePaths } from '$lib/constants/coinImagePaths';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+
+	// Data that will be loaded when passed to the
+	// page in state
+	let data: UserLiquidity | null = null;
+	if (browser) {
+		data = history?.state?.['sveltekit:states'] || null;
+
+		// If data is still missing the page becomes useless and user
+		// get redirected to "Your Liquidity" page
+		if (data === null) {
+			goto('/your-liquidity');
+		}
+	}
+
+	let removeAmount: number | null = $state(null);
+	$effect(() => {
+		if (removeAmount && removeAmount <= 0) removeAmount = 0;
+	});
 
 	//**************************************************//
 	//** Local constants **//
 	//**************************************************//
+	const ticker1Image = data?.coin1?.ticker
+		? coinImagePaths[data.coin1.ticker as keyof CoinImagePaths]
+		: null;
+	const ticker2Image = data?.coin2?.ticker
+		? coinImagePaths[data.coin2.ticker as keyof CoinImagePaths]
+		: null;
+
 	const removeAmountQuickButtons = [
 		{
 			title: '25%'
@@ -20,19 +50,41 @@
 		}
 	];
 
-	// WARN: this will come from blockchain, code is temporary,
-	// for representing purposes only
-	// TODO: make proper type binding, possibly to already existing types
-	const userPooledCoins = [
-		{
-			ticker: 'UNI',
-			amount: '2.2555'
-		},
-		{
-			ticker: 'UNI',
-			amount: '2.9'
-		}
-	];
+	const userCoinsToBeReturned = data
+		? [
+				{
+					ticker: data.coin1.ticker,
+					amount: '0',
+					image: ticker1Image
+				},
+				{
+					ticker: data.coin2.ticker,
+					amount: '0',
+					image: ticker2Image
+				}
+			]
+		: [];
+
+	const userLiquidityDetails = data
+		? [
+				{
+					title: 'Your pool share:',
+					value: `${data.poolShare}%`
+				},
+				{
+					title: data.coin1.ticker.toUpperCase(),
+					value: data.coin1.pooledAmount
+				},
+				{
+					title: data.coin2.ticker.toUpperCase(),
+					value: data.coin2.pooledAmount
+				}
+			]
+		: [];
+
+	//**************************************************//
+	//** Component methods **//
+	//**************************************************//
 </script>
 
 <section class="flex justify-center pt-36 font-roboto text-white">
@@ -55,10 +107,10 @@
 					<!-------------------------------------------------->
 					<!-- Remove amount input -->
 					<!-------------------------------------------------->
-					<!-- DEBUG: user can input negative amount -->
 					<input
+						bind:value={removeAmount}
 						type="number"
-						class="border-3 rounded-full border-app_pink bg-transparent p-3 text-xl font-bold placeholder:opacity-10 focus:outline-none"
+						class="rounded-full border-3 border-app_pink bg-transparent p-3 text-xl font-bold placeholder:opacity-10 focus:outline-none"
 						placeholder="Enter your amount"
 					/>
 					<!-------------------------------------------------->
@@ -78,10 +130,10 @@
 				<!-- User pooled coins -->
 				<!-------------------------------------------------->
 				<div class="flex flex-col gap-6 font-light">
-					{#each userPooledCoins as coin}
+					{#each userCoinsToBeReturned as coin}
 						<div class="flex justify-between">
 							<div class="flex items-center gap-1">
-								<img src={UNI} alt="" class="h-6" />
+								<img src={ticker1Image} alt="" class="h-6" />
 								<span class="text-xl">{coin.ticker}</span>
 							</div>
 							<span class="text-2xl">{coin.amount}</span>
@@ -93,7 +145,7 @@
 			<!-- Approve remove liquidity button -->
 			<!-------------------------------------------------->
 			<button
-				class="border-3 hover:shadow-app-button w-56 rounded-full border-app_pink py-3 text-center shadow transition-all duration-200 hover:bg-app_pink hover:shadow-app_pink"
+				class="w-56 rounded-full border-3 border-app_pink py-3 text-center shadow transition-all duration-200 hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink"
 			>
 				<span class="text-xl font-bold capitalize">approve</span>
 			</button>
@@ -104,18 +156,12 @@
 		<div
 			class="flex w-3/4 flex-col gap-8 rounded-3xl border border-app_pink bg-gradient-to-t from-[#13002B] to-[#26065A] px-2.5 py-8 text-xl font-normal"
 		>
-			<div class="flex justify-between">
-				<span>Your pool share:</span>
-				<span>0.00065%</span>
-			</div>
-			<div class="flex justify-between">
-				<span>TIC:</span>
-				<span>1.500</span>
-			</div>
-			<div class="flex justify-between">
-				<span>TIC:</span>
-				<span>0.56548</span>
-			</div>
+			{#each userLiquidityDetails as detail}
+				<div class="flex justify-between">
+					<span>{detail.title}</span>
+					<span>{detail.value}</span>
+				</div>
+			{/each}
 		</div>
 	</div>
 </section>
