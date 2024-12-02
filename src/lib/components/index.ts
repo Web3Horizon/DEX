@@ -4,3 +4,4 @@ export { default as ConnectWallet } from './buttons/ConnectWallet.svelte';
 export { default as Modal } from './overlays/Modal.svelte';
 export {default as SelectToken} from './buttons/SelectToken.svelte'
 export {default as Footer } from './Footer.svelte'
+export { default as SingleUserLiquidity } from './SingleUserLiquidity.svelte';
