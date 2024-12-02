@@ -1,39 +1,59 @@
 <script lang="ts">
+	//**************************************************//
+	//** Imports from packages **//
+	//**************************************************//
 	import Icon from '@iconify/svelte';
+
+	//**************************************************//
+	//** Imports from library **//
+	//**************************************************//
 	import { coinImagePaths } from '$lib/constants/coinImagePaths';
 	import type { UserLiquidity } from '$lib/constants/userLiquidity';
 
-	let { ticker1, ticker2, details }: UserLiquidity = $props();
+	//**************************************************//
+	//** Local type declarations **//
+	//**************************************************//
+	type SingleUserLiquidityParameters = {
+		data: UserLiquidity;
+	};
 
-	const tiker1Image = coinImagePaths[ticker1 as keyof typeof coinImagePaths];
-	const tiker2Image = coinImagePaths[ticker2 as keyof typeof coinImagePaths];
+	//**************************************************//
+	//** Component properties **//
+	//**************************************************//
+	let { data }: SingleUserLiquidityParameters = $props();
 
+	//**************************************************//
+	//** Component state variables **//
+	//**************************************************//
 	let isExpanded = $state(false);
 
-	const toggle = () => (isExpanded = !isExpanded);
-
+	//**************************************************//
+	//** Local constants **//
+	//**************************************************//
+	const tiker1Image = coinImagePaths[data.coin1.ticker as keyof typeof coinImagePaths];
+	const tiker2Image = coinImagePaths[data.coin2.ticker as keyof typeof coinImagePaths];
 	const userLiquidityDetails = [
 		{
 			property: 'Your total pool tokens:',
-			value: details.poolTokens,
+			value: data.poolTokenAmount,
 			image: null,
 			ticker: null
 		},
 		{
-			property: `Pooled ${ticker1}:`,
-			value: details.ticker1Pooled,
+			property: `Pooled ${data.coin1.ticker}:`,
+			value: data.coin1.pooledAmount,
 			image: tiker1Image,
-			ticker: ticker1
+			ticker: data.coin1.ticker
 		},
 		{
-			property: `Polled ${ticker2}:`,
-			value: details.ticker2Pooled,
+			property: `Polled ${data.coin2.ticker}:`,
+			value: data.coin2.pooledAmount,
 			image: tiker2Image,
-			ticker: ticker2
+			ticker: data.coin2.ticker
 		},
 		{
 			property: 'Your pool share:',
-			value: details.poolShare,
+			value: data.poolShare,
 			image: null,
 			ticker: null
 		}
@@ -50,6 +70,13 @@
 			href: ''
 		}
 	];
+
+	//**************************************************//
+	//** Component functions **//
+	//**************************************************//
+	function toggle(): void {
+		isExpanded = !isExpanded;
+	}
 </script>
 
 <div
@@ -58,8 +85,8 @@
 	<div class="flex w-full items-center justify-between">
 		<div class="flex items-center gap-1">
 			<div class="flex gap-0.5">
-				<img src={tiker1Image} alt="{ticker1} coin" class="h-8" />
-				<img src={tiker2Image} alt="{ticker2} coin" class="h-8" />
+				<img src={tiker1Image} alt="{data.coin1.ticker} coin" class="h-8" />
+				<img src={tiker2Image} alt="{data.coin2.ticker} coin" class="h-8" />
 			</div>
 			<div class="font-roboto text-xl font-bold text-white">UNI/UNI</div>
 		</div>

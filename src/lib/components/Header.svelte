@@ -106,7 +106,7 @@
 		</div>
 	</a>
 
-	<div class="flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
+	<div class=" flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
 		{#each navigationComponents as navComponent}
 			{#if navComponent.text === 'liquidity'}
 				<div class="relative">
@@ -125,7 +125,7 @@
 						<div
 							bind:this={dropdownElement}
 							transition:fade={{ duration: 300 }}
-							class="absolute top-full mt-6 flex flex-col gap-5 text-nowrap rounded-3xl bg-[#50259D73] px-1.5 py-5 font-bold"
+							class="absolute top-full mt-6 flex flex-col gap-5 text-nowrap rounded-3xl bg-[#50259D73] bg-opacity-20 px-1.5 py-5 font-bold"
 						>
 							{#each liquidityDropDownItems as item}
 								<button

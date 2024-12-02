@@ -23,6 +23,9 @@ export default {
 			},
 			borderWidth: {
 				'3': '3px'
+			},
+			borderRadius: {
+				'4xl': '3rem'
 			}
 		}
 	},
