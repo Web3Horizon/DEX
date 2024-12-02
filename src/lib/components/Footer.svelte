@@ -18,25 +18,15 @@
 			</a>
 
 			<!-- GitHub -->
-			<a
-				href="https://github.com/your-repo"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="social-icon"
-			>
+			<a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer">
 				<Github class="h-[20px] w-[20px] " />
 			</a>
 			<!-- Google -->
-			<a href="mailto:example@gmail.com" class="hover:text-pink-500">
+			<a href="mailto:example@gmail.com" target="_blank" rel="noopener noreferrer">
 				<Google class="h-[20px] w-[20px]" />
 			</a>
 			<!-- WhatsApp -->
-			<a
-				href="https://wa.me/your-number"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="hover:text-pink-500"
-			>
+			<a href="https://wa.me/your-number" target="_blank" rel="noopener noreferrer">
 				<Whatsaap class="h-[20px] w-[20px]" />
 			</a>
 		</div>

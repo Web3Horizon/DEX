@@ -9,6 +9,8 @@
 
 <Header></Header>
 <Background></Background>
-<!-- <Footer></Footer> -->
+
 <!-- Render all the children, i.e. nested routes -->
 {@render children()}
+
+<Footer></Footer>
