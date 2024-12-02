@@ -12,6 +12,3 @@
 
 <!-- Render all the children, i.e. nested routes -->
 {@render children()}
-
-<style lang="postcss">
-</style>
