@@ -32,7 +32,7 @@
 	const liquidityDropDownItems = [
 		{
 			text: 'add liquidity',
-			href: '/',
+			href: '/addliquidity',
 			icon: {
 				width: 24,
 				height: 23,
@@ -106,7 +106,7 @@
 		</div>
 	</a>
 
-	<div class=" flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
+	<div class="flex justify-around rounded-3xl bg-[#50259D73] py-4 font-roboto font-bold">
 		{#each navigationComponents as navComponent}
 			{#if navComponent.text === 'liquidity'}
 				<div class="relative">

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 
-	let { isOpen = $bindable(false), children } = $props();
+	let { isOpen = $bindable(false), children, modalContentClass = '' } = $props();
 	let dialog: HTMLDialogElement | null = $state(null);
 
 	const close = () => {
@@ -36,7 +36,7 @@
 </script>
 
 <dialog class="custom-backdrop bg-transparent outline-none" bind:this={dialog}>
-	<div class="flex flex-col rounded-3xl bg-deep_dark_purple p-4">
+	<div class="bg-deep_dark_purple flex flex-col rounded-3xl p-4">
 		<div class="flex justify-end">
 			<button aria-label="close" class="flex" onclick={close}>
 				<Icon
@@ -47,7 +47,7 @@
 				/>
 			</button>
 		</div>
-		<div class="px-20">
+		<div class={modalContentClass}>
 			{@render children()}
 		</div>
 	</div>
