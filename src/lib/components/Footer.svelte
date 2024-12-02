@@ -37,13 +37,18 @@
 		<h1 class="text-2xl font-bold">App</h1>
 		<ul class="flex flex-col gap-2">
 			<li>
-				<a href="/navigateHome" class="hover:text-[#E018FF]">Swap</a>
+				<a href="/navigateHome" class="transition-all duration-500 hover:text-[#E018FF]">Swap</a>
 			</li>
 			<li>
-				<a href="/addliquidity">Liquidity</a>
+				<a href="/addliquidity" class="transition-all duration-500 hover:text-[#E018FF]"
+					>Liquidity</a
+				>
 			</li>
 			<li>
-				<a href="https://coinmarketcap.com/">Farms</a>
+				<a
+					href="https://coinmarketcap.com/"
+					class="transition-all duration-500 hover:text-[#E018FF]">Farms</a
+				>
 			</li>
 		</ul>
 	</div>
@@ -51,16 +56,27 @@
 		<h1 class="text-2xl font-bold">Community</h1>
 		<ul class="flex flex-col gap-2">
 			<li>
-				<a href="https://discord.com/invite/your-invite-code">Discord</a>
+				<a
+					href="https://discord.com/invite/your-invite-code"
+					class="transition-all duration-500 hover:text-[#E018FF]">Discord</a
+				>
 			</li>
 			<li>
-				<a href="https://github.com/Web3Horizon ">GitHub</a>
+				<a
+					href="https://github.com/Web3Horizon "
+					class="transition-all duration-500 hover:text-[#E018FF]">GitHub</a
+				>
 			</li>
 			<li>
-				<a href="https://web.whatsapp.com/ ">WhatsApp</a>
+				<a
+					href="https://web.whatsapp.com/ "
+					class="transition-all duration-500 hover:text-[#E018FF]">WhatsApp</a
+				>
 			</li>
 			<li>
-				<a href="mailto:example@gmail.com">Gmail</a>
+				<a href="mailto:example@gmail.com" class="transition-all duration-500 hover:text-[#E018FF]"
+					>Gmail</a
+				>
 			</li>
 		</ul>
 	</div>
@@ -68,13 +84,13 @@
 		<h1 class="text-2xl font-bold">Info</h1>
 		<ul class="flex flex-col gap-2">
 			<li>
-				<a href="/">News</a>
+				<a href="/" class="transition-all duration-500 hover:text-[#E018FF]">News</a>
 			</li>
 			<li>
-				<a href="/">Help</a>
+				<a href="/" class="transition-all duration-500 hover:text-[#E018FF]">Help</a>
 			</li>
 			<li>
-				<a href="/">About Us</a>
+				<a href="/" class="transition-all duration-500 hover:text-[#E018FF]">About Us</a>
 			</li>
 		</ul>
 	</div>
