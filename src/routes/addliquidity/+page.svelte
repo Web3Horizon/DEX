@@ -20,7 +20,7 @@
 	// let poolShare:
 </script>
 
-<div class="flex flex-col items-center">
+<div class="flex flex-col items-center pt-32">
 	<!-- Liquidity Image -->
 	<img src={liquidityimage} alt="liquidity" class=" h-auto w-full max-w-[200px]" />
 
@@ -105,7 +105,7 @@
 		</div>
 
 		<div
-			class="absolute right-[200px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 border-fuchsia-600 px-4 py-6"
+			class="absolute right-[200px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
 		>
 			<h3 class="font-roboto flex items-center text-xl font-bold">Your Pool Data</h3>
 
@@ -189,14 +189,14 @@
 		<!-- Get Started Button -->
 		<div class="col-span-1 mt-6 flex justify-center lg:col-span-4">
 			<button
-				class="font-roboto hover:shadow-app-button hover:shadow-app_pink flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold hover:bg-[#E018FF]"
+				class="font-roboto hover:shadow-app-button hover:shadow-app_pink flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold transition-all duration-200 hover:bg-[#E018FF]"
 			>
 				Approve
 			</button>
 		</div>
 
 		<!-- Disclaimer -->
-		<div class="font-roboto col-span-1 text-center text-base text-sm text-gray-400 lg:col-span-4">
+		<div class="font-roboto col-span-1 text-center text-sm text-gray-400 lg:col-span-4">
 			Cryptocurrencies are highly risky and volatile. The value of your holding could fall to zero.
 			Consider your financial circumstances and risk appetite.
 		</div>
