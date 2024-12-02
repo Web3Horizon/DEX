@@ -6,3 +6,7 @@ export { default as AddLiquidity } from './AddLiquidity.svelte';
 export { default as YourLiquidity } from './YourLiquidity.svelte';
 export { default as Wallet } from './Wallet.svelte';
 export { default as Tick } from './Tick.svelte';
+export { default as Discord } from './Discord.svelte';
+export { default as Github } from './Github.svelte';
+export { default as Whatsaap } from './Whatsaap.svelte';
+export { default as Google } from './Google.svelte';

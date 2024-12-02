@@ -6,3 +6,7 @@
 	opacity: 0; /* Ensure element is hidden initially */
 	animation: fadeIn 0.3s ease-out forwards;
 }
+
+.social-icon:hover {
+	fill: #e018ff; /* Pink color */
+}
