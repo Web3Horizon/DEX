@@ -30,7 +30,7 @@
 
 	<!-- Main Card Container -->
 	<div
-		class="grid h-[575px] w-full max-w-[1114px] grid-cols-1 gap-3 rounded-[50px] bg-[#5800CA]/30 px-10 py-8 text-white backdrop-blur-[4px] lg:grid-cols-4"
+		class="grid h-full w-full max-w-[1114px] grid-cols-1 gap-3 rounded-[50px] bg-[#5800CA]/30 px-10 py-8 text-white backdrop-blur-[4px] lg:grid-cols-4"
 	>
 		<div
 			class="absolute right-[150px] top-[50px] flex flex-row items-center space-x-[100px] justify-self-end"
@@ -109,7 +109,7 @@
 		</div>
 
 		<div
-			class="absolute right-[200px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
+			class="absolute right-[190px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
 		>
 			<h3 class="font-roboto flex items-center text-xl font-bold">Your Pool Data</h3>
 

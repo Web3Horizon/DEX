@@ -3,7 +3,9 @@
 	// This component handles the background design only.
 </script>
 
-<div class="fixed inset-0 z-[-1] overflow-hidden bg-[#1E0447]">
+<div
+	class="animated-background fixed inset-0 z-[-1] h-screen w-screen overflow-hidden bg-gradient-to-r from-[#1E0447] via-[#13022f] to-[#1E0447]"
+>
 	<!-- Top-left circle -->
 	<div
 		class="absolute h-[674px] w-[674px] rounded-full bg-[#823FFF] opacity-[0.34] blur-[200px]"

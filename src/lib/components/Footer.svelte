@@ -5,7 +5,7 @@
 </script>
 
 <footer
-	class="px-111 grid grid-cols-4 bg-gradient-to-t from-black to-purple-900 px-16 py-5 text-white"
+	class="px-111 animate-pulseLight duration-1000ms shadow-top-footer grid grid-cols-4 bg-gradient-to-t from-black to-purple-900 px-16 py-5 text-white"
 >
 	<!-- Logo Section -->
 	<div>
