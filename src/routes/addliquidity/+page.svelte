@@ -1,5 +1,5 @@
 <script lang="ts">
-	import liquidityimage from '$lib/assets/img/liquiditypic.png';
+	import LiquidityMonsterImage from '$lib/assets/img/liquidity_monster.png';
 	import { SelectToken } from '$lib/components';
 
 	type Token = {
@@ -20,9 +20,13 @@
 	// let poolShare:
 </script>
 
-<div class="flex flex-col items-center">
+<div class="relative flex flex-col px-64 py-64">
 	<!-- Liquidity Image -->
-	<img src={liquidityimage} alt="liquidity" class=" h-auto w-full max-w-[200px]" />
+	<img
+		src={LiquidityMonsterImage}
+		alt="Liquidity monster"
+		class="absolute left-1/2 top-32 z-0 mx-auto h-auto w-full max-w-[225px] -translate-x-1/2 transform"
+	/>
 
 	<!-- Main Card Container -->
 	<div
@@ -105,7 +109,7 @@
 		</div>
 
 		<div
-			class="absolute right-[200px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 border-fuchsia-600 px-4 py-6"
+			class="max-ww-full absolute right-[150px] top-[200px] flex max-w-[350px] flex-col items-center space-x-4 justify-self-end rounded-[20px] border-[3px] border-fuchsia-600 px-4 py-6"
 		>
 			<h3 class="font-roboto flex items-center text-xl font-bold">Your Pool Data</h3>
 
@@ -196,7 +200,7 @@
 		</div>
 
 		<!-- Disclaimer -->
-		<div class="font-roboto col-span-1 text-center text-base text-sm text-gray-400 lg:col-span-4">
+		<div class="font-roboto col-span-1 text-center text-base text-gray-400 lg:col-span-4">
 			Cryptocurrencies are highly risky and volatile. The value of your holding could fall to zero.
 			Consider your financial circumstances and risk appetite.
 		</div>

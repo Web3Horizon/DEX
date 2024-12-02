@@ -4,9 +4,11 @@
 	// Any TypeScript logic can be added here if required.
 </script>
 
-<footer class="grid grid-cols-4 bg-gradient-to-t from-black to-purple-900 p-4 text-white">
+<footer
+	class="px-111 grid grid-cols-4 bg-gradient-to-t from-black to-purple-900 px-16 py-5 text-white"
+>
 	<!-- Logo Section -->
-	<div class="col-span-1">
+	<div>
 		<Logo class="theme-color-cycle" width="59" height="77" />
 		<div class="flex space-x-5 py-5">
 			<a
@@ -30,5 +32,50 @@
 				<Whatsaap class="h-[20px] w-[20px]" />
 			</a>
 		</div>
+	</div>
+	<div class="font-roboto">
+		<h1 class="text-2xl font-bold">App</h1>
+		<ul class="flex flex-col gap-2">
+			<li>
+				<a href="/navigateHome" class="hover:text-[#E018FF]">Swap</a>
+			</li>
+			<li>
+				<a href="/addliquidity">Liquidity</a>
+			</li>
+			<li>
+				<a href="https://coinmarketcap.com/">Farms</a>
+			</li>
+		</ul>
+	</div>
+	<div class="font-roboto">
+		<h1 class="text-2xl font-bold">Community</h1>
+		<ul class="flex flex-col gap-2">
+			<li>
+				<a href="https://discord.com/invite/your-invite-code">Discord</a>
+			</li>
+			<li>
+				<a href="https://github.com/Web3Horizon ">GitHub</a>
+			</li>
+			<li>
+				<a href="https://web.whatsapp.com/ ">WhatsApp</a>
+			</li>
+			<li>
+				<a href="mailto:example@gmail.com">Gmail</a>
+			</li>
+		</ul>
+	</div>
+	<div class="font-roboto">
+		<h1 class="text-2xl font-bold">Info</h1>
+		<ul class="flex flex-col gap-2">
+			<li>
+				<a href="/">News</a>
+			</li>
+			<li>
+				<a href="/">Help</a>
+			</li>
+			<li>
+				<a href="/">About Us</a>
+			</li>
+		</ul>
 	</div>
 </footer>
