@@ -106,13 +106,13 @@
 		</div>
 	</a>
 
-	<div class="font-roboto flex justify-around rounded-3xl bg-[#50259D73] py-4 font-bold">
+	<div class="flex justify-around rounded-3xl bg-[#34136f] py-4 font-roboto font-bold">
 		{#each navigationComponents as navComponent}
 			{#if navComponent.text === 'liquidity'}
 				<div class="relative">
 					<button
 						bind:this={buttonElement}
-						class="hover:stroke-app_pink hover:text-app_pink flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out"
+						class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
 						onclick={navComponent.onClick}
 					>
 						<navComponent.icon.component
@@ -125,7 +125,7 @@
 						<div
 							bind:this={dropdownElement}
 							transition:fade={{ duration: 300 }}
-							class="absolute top-full mt-6 flex flex-col gap-5 text-nowrap rounded-3xl bg-[#50259D73] px-1.5 py-5 font-bold"
+							class="absolute top-full mt-6 flex flex-col gap-5 text-nowrap rounded-3xl bg-[#34136f] px-1.5 py-5 font-bold"
 						>
 							{#each liquidityDropDownItems as item}
 								<button
@@ -141,7 +141,7 @@
 				</div>
 			{:else}
 				<button
-					class="hover:stroke-app_pink hover:text-app_pink flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out"
+					class="flex items-center gap-2.5 stroke-white text-xl transition duration-300 ease-out hover:stroke-app_pink hover:text-app_pink"
 					onclick={navComponent.onClick}
 				>
 					<navComponent.icon.component
