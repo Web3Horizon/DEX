@@ -85,7 +85,7 @@
 					id="amounttop"
 					type="number"
 					placeholder="0"
-					class="font-roboto flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
+					class="font-roboto w-3 flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
 				/>
 
 				<!-- Select Token Component -->
@@ -166,7 +166,7 @@
 					id="amountbotton"
 					type="number"
 					placeholder="0"
-					class="font-roboto flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
+					class="font-roboto w-3 flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
 				/>
 
 				<!-- Select Token Component (Bottom) -->

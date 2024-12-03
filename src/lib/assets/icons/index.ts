@@ -6,3 +6,4 @@ export { default as AddLiquidity } from './AddLiquidity.svelte';
 export { default as YourLiquidity } from './YourLiquidity.svelte';
 export { default as Wallet } from './Wallet.svelte';
 export { default as Tick } from './Tick.svelte';
+export {default as Swapicon} from './swapicon.svelte'

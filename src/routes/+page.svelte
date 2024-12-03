@@ -1,5 +1,7 @@
-<script>
-	import SwappingCard from "$lib/components/SwappingCard.svelte";
-
+<script lang="ts">
+	import { SwappingCard } from '$lib/components';
+	import { Mascot } from '$lib/components';
 </script>
-<SwappingCard />    
+
+<SwappingCard></SwappingCard>
+<Mascot></Mascot>

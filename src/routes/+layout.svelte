@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Header, Background, SwappingCard } from '$lib/components';
+	import { Header, Background } from '$lib/components';
 
 	// Applies styles to the whole app
 	import '../app.css';
