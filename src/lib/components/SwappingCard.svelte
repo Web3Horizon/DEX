@@ -43,7 +43,7 @@
 	];
 </script>
 
-<div class=" flex flex-col pl-32 pt-32">
+<div class=" flex flex-col pb-32 pl-32 pt-32">
 	<div class="  flex w-[490px]">
 		<h1
 			class="font-roboto col-span-2 text-balance text-center text-[45px] font-bold text-[#ffffff]"

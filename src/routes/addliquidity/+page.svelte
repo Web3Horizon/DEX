@@ -1,5 +1,5 @@
 <script lang="ts">
-	import liquidityimage from '$lib/assets/img/liquiditypic.png';
+	import LiquidityMonsterImage from '$lib/assets/img/liquidity_monster.png';
 	import { SelectToken } from '$lib/components';
 
 	type Token = {
@@ -20,13 +20,17 @@
 	// let poolShare:
 </script>
 
-<div class="flex flex-col items-center pt-32">
+<div class="relative flex flex-col px-64 py-64">
 	<!-- Liquidity Image -->
-	<img src={liquidityimage} alt="liquidity" class=" h-auto w-full max-w-[200px]" />
+	<img
+		src={LiquidityMonsterImage}
+		alt="Liquidity monster"
+		class="absolute left-1/2 top-32 z-0 mx-auto h-auto w-full max-w-[225px] -translate-x-1/2 transform"
+	/>
 
 	<!-- Main Card Container -->
 	<div
-		class="grid h-[575px] w-full max-w-[1114px] grid-cols-1 gap-3 rounded-[50px] bg-[#5800CA]/30 px-10 py-8 text-white backdrop-blur-[4px] lg:grid-cols-4"
+		class="grid h-full w-full max-w-[1114px] grid-cols-1 gap-3 rounded-[50px] bg-[#5800CA]/30 px-10 py-8 text-white backdrop-blur-[4px] lg:grid-cols-4"
 	>
 		<div
 			class="absolute right-[150px] top-[50px] flex flex-row items-center space-x-[100px] justify-self-end"
@@ -105,7 +109,7 @@
 		</div>
 
 		<div
-			class="absolute right-[200px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
+			class="absolute right-[190px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
 		>
 			<h3 class="font-roboto flex items-center text-xl font-bold">Your Pool Data</h3>
 
@@ -189,7 +193,7 @@
 		<!-- Get Started Button -->
 		<div class="col-span-1 mt-6 flex justify-center lg:col-span-4">
 			<button
-				class="font-roboto hover:shadow-app-button hover:shadow-app_pink flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold transition-all duration-200 hover:bg-[#E018FF]"
+				class="font-roboto hover:shadow-app-button hover:shadow-app_pink flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold transition-all duration-500 hover:bg-[#E018FF]"
 			>
 				Approve
 			</button>

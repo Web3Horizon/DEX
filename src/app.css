@@ -6,8 +6,3 @@
 
 @import './style/animations/globals.css';
 @import './style/animations/keyframes.css';
-
-/* NOTE: TEMPORARY */
-html {
-	background-color: #1e0447;
-}
