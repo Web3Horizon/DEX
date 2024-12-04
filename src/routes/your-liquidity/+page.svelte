@@ -32,13 +32,13 @@
 	];
 </script>
 
-<section class="relative flex flex-col gap-5 px-64 pt-64">
+<section class="relative flex flex-col gap-5 px-64 py-64">
 	<img
 		src={LiquidityMonsterImage}
 		alt="Liquidity monster"
 		class="absolute left-1/2 top-32 z-0 mx-auto h-auto w-full max-w-[350px] -translate-x-1/2 transform"
 	/>
-	<h1 class="z-10 font-roboto text-4xl font-bold capitalize text-white">your liquidity</h1>
+	<h1 class="font-roboto z-10 text-4xl font-bold capitalize text-white">your liquidity</h1>
 	<div class="z-10 flex flex-col gap-5">
 		{#each userLiquidities as userLiq}
 			<SingleUserLiquidity data={userLiq} />
