@@ -1,14 +1,13 @@
 import type { CoinImagePaths } from './coinImagePaths';
 
-type LiquidityDetails = {
-	poolTokens: string;
-	ticker1Pooled: string;
-	ticker2Pooled: string;
+export type UserLiquidity = {
+	poolTokenAmount: string;
 	poolShare: string;
+	coin1: CoinPooledDetails;
+	coin2: CoinPooledDetails;
 };
 
-export type UserLiquidity = {
-	ticker1: keyof CoinImagePaths;
-	ticker2: keyof CoinImagePaths;
-	details: LiquidityDetails;
+type CoinPooledDetails = {
+	ticker: keyof CoinImagePaths;
+	pooledAmount: string;
 };

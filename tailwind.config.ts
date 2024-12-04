@@ -33,6 +33,9 @@ export default {
 			},
 			animation: {
 				pulseLight: 'pulseLight 5s ease-in-out infinite'
+			},
+			borderRadius: {
+				'4xl': '3rem'
 			}
 		}
 	},
