@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { Logo, Discord, Github, Google, Whatsaap } from '$lib/assets/icons';
-	// Any TypeScript logic can be added here if required.
 </script>
 
 <footer
-	class="px-111 animate-pulseLight duration-1000ms shadow-top-footer grid grid-cols-4 bg-gradient-to-t from-black to-purple-900 px-16 py-5 text-white"
+	class="mt-32 grid animate-pulseLight grid-cols-4 bg-gradient-to-t from-black to-purple-900 px-16 py-5 text-white shadow-top-footer duration-1000"
 >
 	<!-- Logo Section -->
 	<div>

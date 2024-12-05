@@ -1,4 +1,4 @@
-import type { CoinImagePaths } from './coinImagePaths';
+import type { AvailableTokens } from '$lib/types/tokens/AvailableTokens';
 
 export type UserLiquidity = {
 	poolTokenAmount: string;
@@ -8,6 +8,6 @@ export type UserLiquidity = {
 };
 
 type CoinPooledDetails = {
-	ticker: keyof CoinImagePaths;
+	ticker: keyof AvailableTokens;
 	pooledAmount: string;
 };

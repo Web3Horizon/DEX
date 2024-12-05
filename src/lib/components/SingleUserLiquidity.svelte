@@ -7,9 +7,9 @@
 	//**************************************************//
 	//** Imports from library **//
 	//**************************************************//
-	import { coinImagePaths } from '$lib/constants/coinImagePaths';
 	import type { UserLiquidity } from '$lib/constants/userLiquidity';
 	import { goto } from '$app/navigation';
+	import { availableTokens } from '$lib/constants/availableTokens';
 
 	//**************************************************//
 	//** Local type declarations **//
@@ -31,8 +31,8 @@
 	//**************************************************//
 	//** Local constants **//
 	//**************************************************//
-	const tiker1Image = coinImagePaths[data.coin1.ticker as keyof typeof coinImagePaths];
-	const tiker2Image = coinImagePaths[data.coin2.ticker as keyof typeof coinImagePaths];
+	const tiker1Image = availableTokens[data.coin1.ticker].imgPath;
+	const tiker2Image = availableTokens[data.coin2.ticker].imgPath;
 	const userLiquidityDetails = [
 		{
 			property: 'Your total pool tokens:',
@@ -63,8 +63,7 @@
 		{
 			title: 'add',
 			action: () => {
-				// WARN: add the actual path
-				// goto('');
+				goto('/addliquidity', { state: data });
 			}
 		},
 		{
@@ -95,7 +94,9 @@
 				<img src={tiker1Image} alt="{data.coin1.ticker} coin" class="h-8" />
 				<img src={tiker2Image} alt="{data.coin2.ticker} coin" class="h-8" />
 			</div>
-			<div class="font-roboto text-xl font-bold text-white">UNI/UNI</div>
+			<div class="font-roboto text-xl font-bold text-white">
+				{data.coin1.ticker}/{data.coin2.ticker}
+			</div>
 		</div>
 
 		<!-------------------------------------------------->
@@ -127,8 +128,8 @@
 			</div>
 
 			<!-------------------------------------------------->
-			<!-- Values of the corresponding -->
-			<!-- properties - right side -->
+			<!-- Values of the corresponding properties -->
+			<!-- right side -->
 			<!-------------------------------------------------->
 			<div class="flex flex-col items-center gap-6">
 				{#each userLiquidityDetails as detail}
