@@ -1,208 +1,165 @@
 <script lang="ts">
 	import LiquidityMonsterImage from '$lib/assets/img/liquidity_monster.png';
-	import { SelectToken } from '$lib/components';
+	import { TokenInput } from '$lib/components';
+	import ConnectWallet from '$lib/components/buttons/ConnectWallet.svelte';
+	import { availableTokens } from '$lib/constants/availableTokens';
+	import { walletConnected } from '$lib/stores/wallet';
+	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
+	import type { TokenInfo } from '$lib/types/tokens/Token';
 
-	type Token = {
-		name: string;
-		icon: string;
-	};
-	type Pool = {
-		id: number;
-	};
-	type Share = {
-		id: number;
+	type PoolField = {
+		title: string;
+		value: string;
+		img: string | null;
 	};
 
-	// Token states
-	let selectedTopToken: Token | null = null;
-	let selectedBottomToken: Token | null = null;
-	// let totalPool:
-	// let poolShare:
+	let token1Amount: number | null = $state(null);
+	let token2Amount: number | null = $state(null);
+
+	let selectedTicker1: TokenTickers | null = $state(null);
+	let selectedTicker2: TokenTickers | null = $state(null);
+
+	let token1Info: TokenInfo | null = $state(null);
+	let token2Info: TokenInfo | null = $state(null);
+
+	let userPoolData: PoolField[] = $state([
+		{
+			title: 'Your total pool tokens:',
+			value: '1.1',
+			img: null
+		},
+		{
+			title: '',
+			value: '',
+			img: null
+		},
+		{
+			title: '',
+			value: '',
+			img: null
+		},
+		{
+			title: 'Your pool share:',
+			value: '0.05%',
+			img: null
+		}
+	]);
+
+	$effect(() => {
+		if (token1Info) {
+			userPoolData[1].title = `Pooled ${token1Info.ticker}:`;
+			userPoolData[1].value = '12.3';
+			userPoolData[1].img = token1Info.imgPath;
+		}
+	});
+
+	$effect(() => {
+		if (token2Info) {
+			userPoolData[2].title = `Pooled ${token2Info.ticker}:`;
+			userPoolData[2].value = '174.909';
+			userPoolData[2].img = token2Info.imgPath;
+		}
+	});
+
+	$effect(() => {
+		if (selectedTicker1) token1Info = availableTokens[selectedTicker1];
+	});
+
+	$effect(() => {
+		if (selectedTicker2) token2Info = availableTokens[selectedTicker2];
+	});
 </script>
 
-<div class="relative flex flex-col px-64 py-64">
+<section class="flex flex-col justify-center px-36 pt-32">
 	<!-- Liquidity Image -->
 	<img
 		src={LiquidityMonsterImage}
 		alt="Liquidity monster"
-		class="absolute left-1/2 top-32 z-0 mx-auto h-auto w-full max-w-[225px] -translate-x-1/2 transform"
+		class="mx-auto h-auto w-full max-w-[225px]"
 	/>
-
-	<!-- Main Card Container -->
+	<!-------------------------------------------------->
+	<!-- Main box -->
+	<!-------------------------------------------------->
 	<div
-		class="grid h-full w-full max-w-[1114px] grid-cols-1 gap-3 rounded-[50px] bg-[#5800CA]/30 px-10 py-8 text-white backdrop-blur-[4px] lg:grid-cols-4"
+		class="flex flex-col items-center gap-16 rounded-4xl border border-app_pink bg-gradient-to-t from-[#2C0768] to-[#1A053B] px-16 pb-12 pt-8 font-roboto text-white"
 	>
-		<div
-			class="absolute right-[150px] top-[50px] flex flex-row items-center space-x-[100px] justify-self-end"
-		>
-			<!-- Top Token -->
-			<div class="flex h-[100px] w-[100px] flex-col items-center">
-				{#if selectedTopToken}
-					<img
-						src={selectedTopToken.icon}
-						alt={selectedTopToken.name}
-						class="h-full w-full rounded-full object-cover"
+		<div class="grid w-full grid-cols-2 gap-x-32">
+			<!-------------------------------------------------->
+			<!-- Left side: -->
+			<!-- Heading and inputs -->
+			<!-------------------------------------------------->
+			<div class="flex flex-col gap-8">
+				<!-------------------------------------------------->
+				<!-- Heading -->
+				<!-------------------------------------------------->
+				<h1 class="text-4xl font-bold capitalize">add liquidity</h1>
+
+				<!-------------------------------------------------->
+				<!-- Inputs for 2 tokens -->
+				<!-------------------------------------------------->
+				{#if $walletConnected}
+					<TokenInput
+						bind:selectedTicker={selectedTicker1}
+						bind:tickerToExclude={selectedTicker2}
+						bind:amount={token1Amount}
 					/>
-					<!-- Token Name under the logo -->
-					<div class="mt-2 text-sm text-white">{selectedTopToken.name}</div>
-				{:else}
-					<div class="h-full w-full rounded-full"></div>
+					<TokenInput
+						bind:selectedTicker={selectedTicker2}
+						bind:tickerToExclude={selectedTicker1}
+						bind:amount={token2Amount}
+					/>
 				{/if}
 			</div>
 
-			<!-- Bottom Token -->
-			<div class="flex h-[100px] w-[100px] flex-col items-center">
-				{#if selectedBottomToken}
-					<img
-						src={selectedBottomToken.icon}
-						alt={selectedBottomToken.name}
-						class="h-full w-full rounded-full object-cover"
-					/>
-					<!-- Token Name under the logo -->
-					<div class="mt-2 text-sm text-white">{selectedBottomToken.name}</div>
-				{:else}
-					<div class="h-full w-full rounded-full"></div>
-				{/if}
-			</div>
-		</div>
-		<!-- Title -->
-		<h1
-			class="font-roboto mb-[20px] text-center text-[35px] font-bold
-		"
-		>
-			Add Liquidity
-		</h1>
-
-		<!-- Amount Card1 (Top) -->
-		<div
-			class="col-span-1 flex h-[160px] max-w-[474px] flex-col items-center space-y-4 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
-		>
-			<!-- Amount Label -->
-			<label for="amount" class="font-roboto self-start text-[16px] font-medium text-gray-400">
-				Amount
-			</label>
-
-			<!-- Input Row with SelectToken -->
-			<div class="flex w-full items-center space-x-4">
-				<!-- Amount Input -->
-				<input
-					id="amounttop"
-					type="number"
-					placeholder="0"
-					class="font-roboto flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
-				/>
-
-				<!-- Select Token Component -->
-				<SelectToken bind:selectedToken={selectedTopToken} excludeToken={selectedBottomToken} />
-			</div>
-
-			<!-- Max and Balance Section -->
-			<div class="flex w-full items-center space-x-4">
-				<button
-					class="font-roboto flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#6F00FF] text-[12px] font-bold text-white"
-				>
-					Max
-				</button>
-
-				<div class="font-roboto text-[16px] text-white">Balance: 0</div>
-			</div>
-		</div>
-
-		<div
-			class="absolute right-[190px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
-		>
-			<h3 class="font-roboto flex items-center text-xl font-bold">Your Pool Data</h3>
-
-			<!-- Your Total Pool Tokens -->
-			<div class="mt-4">
-				<span class="font-roboto">Your total pool tokens:</span>
-
-				<!-- Display Pooled Top Token -->
-				<div class="mt-2 flex items-center space-x-2">
-					{#if selectedTopToken}
-						<span class="font-roboto">Pooled {selectedTopToken.name}:</span>
-						<img
-							src={selectedTopToken.icon}
-							alt={selectedTopToken.name}
-							class="h-6 w-6 rounded-full"
-						/>
-					{:else}
-						<span class="font-roboto">Pooled :</span>
-					{/if}
+			<!-------------------------------------------------->
+			<!-- Right side of the box, tokens and pool info -->
+			<!-------------------------------------------------->
+			{#if token1Info && token2Info}
+				<div class="flex flex-col gap-12">
+					<div class="flex justify-between">
+						<div class="flex flex-col items-center">
+							<img src={token1Info.imgPath} class="h-full max-w-28" alt="" />
+							<div class="text-3xl font-bold">{token1Info.ticker}</div>
+						</div>
+						<div class="flex flex-col items-center">
+							<img src={token2Info.imgPath} class="h-full max-w-28" alt="" />
+							<div class="text-3xl font-bold">{token2Info.ticker}</div>
+						</div>
+					</div>
+					<div class="flex flex-col gap-2.5 rounded-3xl border border-app_pink px-3 py-8 text-base">
+						{#each userPoolData as poolField}
+							<div class="flex justify-between">
+								<p>{poolField.title}</p>
+								{#if poolField.img}
+									<div class="flex gap-1">
+										<span class="">{poolField.value}</span>
+										<img src={poolField.img} alt={poolField.title} class="h-5 w-auto" />
+									</div>
+								{:else}
+									<span>{poolField.value}</span>
+								{/if}
+							</div>
+						{/each}
+					</div>
 				</div>
-
-				<!-- Display Pooled Bottom Token -->
-				<div class="mt-2 flex items-center space-x-2">
-					{#if selectedBottomToken}
-						<span class="font-roboto">Pooled {selectedBottomToken.name}:</span>
-						<img
-							src={selectedBottomToken.icon}
-							alt={selectedBottomToken.name}
-							class="h-6 w-6 rounded-full"
-						/>
-					{:else}
-						<span class="font-roboto">Pooled :</span>
-					{/if}
+			{:else if (!token1Info || !token2Info) && $walletConnected}
+				<div class="flex items-center justify-center">
+					<span class=" text-2xl">Select tokens to add liquidity</span>
 				</div>
-			</div>
-
-			<!-- Your Pool Share -->
-			<div class="mt-4 flex items-center justify-between">
-				<span>Your pool share:</span>
-				<span>0.00%</span>
-				<!-- Replace this with dynamic data -->
-			</div>
+			{/if}
 		</div>
 
-		<!-- Amount Card2 (Bottom) -->
-		<div
-			class="col-span-1 flex h-[160px] max-w-[474px] flex-col items-center space-y-4 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
-		>
-			<!-- Amount Label -->
-			<label for="amount" class="font-roboto self-start text-[16px] font-medium text-gray-400">
-				Amount
-			</label>
-
-			<!-- Input Row with SelectToken -->
-			<div class="flex w-full items-center space-x-4">
-				<!-- Amount Input -->
-				<input
-					id="amountbotton"
-					type="number"
-					placeholder="0"
-					class="font-roboto flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
-				/>
-
-				<!-- Select Token Component (Bottom) -->
-				<SelectToken bind:selectedToken={selectedBottomToken} excludeToken={selectedTopToken} />
-			</div>
-
-			<!-- Max and Balance Section -->
-			<div class="flex w-full items-center space-x-4">
-				<!-- Max Button -->
-				<button
-					class="font-roboto flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#6F00FF] text-[12px] font-bold text-white"
-				>
-					Max
-				</button>
-				<!-- Balance Text -->
-				<div class="font-roboto text-[16px] text-white">Balance: 0</div>
-			</div>
-		</div>
-
-		<!-- Get Started Button -->
-		<div class="col-span-1 mt-6 flex justify-center lg:col-span-4">
+		<!-------------------------------------------------->
+		<!-- Box action button -->
+		<!-------------------------------------------------->
+		{#if $walletConnected}
 			<button
-				class="font-roboto hover:shadow-app-button hover:shadow-app_pink flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 text-[20px] font-bold transition-all duration-500 hover:bg-[#E018FF]"
+				class="rounded-full border-3 border-app_pink bg-transparent px-10 py-2.5 text-base font-bold capitalize transition-all duration-300 hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink"
 			>
-				Approve
+				approve
 			</button>
-		</div>
-
-		<!-- Disclaimer -->
-		<div class="font-roboto col-span-1 text-center text-sm text-gray-400 lg:col-span-4">
-			Cryptocurrencies are highly risky and volatile. The value of your holding could fall to zero.
-			Consider your financial circumstances and risk appetite.
-		</div>
+		{:else}
+			<ConnectWallet />
+		{/if}
 	</div>
-</div>
+</section>
