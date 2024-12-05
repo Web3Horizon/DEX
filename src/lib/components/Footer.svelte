@@ -37,7 +37,7 @@
 		<h1 class="text-2xl font-bold">App</h1>
 		<ul class="flex flex-col gap-2">
 			<li>
-				<a href="/navigateHome" class="transition-all duration-500 hover:text-[#E018FF]">Swap</a>
+				<a href="/" class="transition-all duration-500 hover:text-[#E018FF]">Swap</a>
 			</li>
 			<li>
 				<a href="/addliquidity" class="transition-all duration-500 hover:text-[#E018FF]"

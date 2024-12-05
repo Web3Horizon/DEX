@@ -75,7 +75,7 @@
 
 		<!-- Amount Card1 (Top) -->
 		<div
-			class="col-span-1 flex h-[160px] max-w-[474px] flex-col items-center space-y-4 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
+			class="col-span-1 flex h-[180px] max-w-[474px] flex-col items-center space-y-4 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
 		>
 			<!-- Amount Label -->
 			<label for="amount" class="font-roboto self-start text-[16px] font-medium text-gray-400">
@@ -89,7 +89,7 @@
 					id="amounttop"
 					type="number"
 					placeholder="0"
-					class="font-roboto w-3 flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
+					class=" font-roboto w-3 flex-grow bg-transparent text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
 				/>
 
 				<!-- Select Token Component -->
@@ -97,7 +97,7 @@
 			</div>
 
 			<!-- Max and Balance Section -->
-			<div class="flex w-full items-center space-x-4">
+			<div class="  mb-7 flex w-full items-center space-x-4 self-start">
 				<button
 					class="font-roboto flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#6F00FF] text-[12px] font-bold text-white"
 				>
@@ -109,7 +109,7 @@
 		</div>
 
 		<div
-			class="absolute right-[190px] top-[200px] flex flex-col items-center space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
+			class=" absolute right-[40px] top-[200px] flex w-[390px] flex-col space-x-4 justify-self-end rounded-[20px] border border-fuchsia-600 px-4 py-6"
 		>
 			<h3 class="font-roboto flex items-center text-xl font-bold">Your Pool Data</h3>
 
@@ -156,7 +156,7 @@
 
 		<!-- Amount Card2 (Bottom) -->
 		<div
-			class="col-span-1 flex h-[160px] max-w-[474px] flex-col items-center space-y-4 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
+			class="col-span-1 flex h-[180px] max-w-[474px] flex-col items-center space-y-4 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
 		>
 			<!-- Amount Label -->
 			<label for="amount" class="font-roboto self-start text-[16px] font-medium text-gray-400">
@@ -178,7 +178,7 @@
 			</div>
 
 			<!-- Max and Balance Section -->
-			<div class="flex w-full items-center space-x-4">
+			<div class="flex w-full items-center space-x-4 self-start">
 				<!-- Max Button -->
 				<button
 					class="font-roboto flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#6F00FF] text-[12px] font-bold text-white"
