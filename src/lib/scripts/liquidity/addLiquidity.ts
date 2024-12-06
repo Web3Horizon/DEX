@@ -1,20 +1,18 @@
 import { PUBLIC_DEXER_V2_ROUTER_ADDR, PUBLIC_SLIPPAGE_TOLERANCE } from '$env/static/public';
 import dexerV2RouterAbi from '$lib/constants/abi/DexerV2Router';
-import { newAppError, type AppError } from '$lib/types/AppError';
+import { AppError, isAppError } from '$lib/types/AppError';
 import type { TokenInfo } from '$lib/types/tokens/Token';
 import { ethers } from 'ethers';
+import getBrowserProvider from '../helpers/getBrowserProvider';
 
 export const addLiquidity = async (
 	token1Amount: number,
 	token1Info: TokenInfo,
 	token2Amount: number,
 	token2Info: TokenInfo
-): Promise<AppError | null> => {
-	if (!window.ethereum) return newAppError('Metamask is required in order to add liquidity', null);
-
+): Promise<null> => {
 	try {
-		// Connect to wallet
-		const provider = new ethers.BrowserProvider(window.ethereum);
+		let provider = getBrowserProvider();
 		const signer = await provider.getSigner();
 
 		// Get Router Contract Instance
@@ -35,7 +33,6 @@ export const addLiquidity = async (
 			token2RawAmount -
 			(token2RawAmount * BigInt(Number(PUBLIC_SLIPPAGE_TOLERANCE) * 1e18)) / BigInt(1e18);
 
-		// Send addLiquidity transaction
 		const tx = await routerContract.addLiquidity(
 			token1Info.address,
 			token2Info.address,
@@ -47,16 +44,14 @@ export const addLiquidity = async (
 		);
 
 		// Wait for transaction to complete
-		const receipt = await tx.wait();
-
-		console.log('Liquidity added successfully:', receipt);
-		alert('Liquidity added successfully!');
+		await tx.wait();
 
 		return null;
-	} catch (error: any) {
-		console.error('Failed to add liquidity:', error);
-		alert('Failed to add liquidity. See console for details.');
-
-		return newAppError('Failed to add liquidity', error.toString());
+	} catch (e: any) {
+		if (isAppError(e)) {
+			throw e;
+		} else {
+			throw new AppError('Unexpected error occured while adding liquidity:', e.toString());
+		}
 	}
 };

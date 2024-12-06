@@ -46,7 +46,9 @@
 	//** Local variables **//
 	//**************************************************//
 	let isLoadingLiquidity: boolean = $state(false);
+	let liquidityLoaded: boolean = $state(false);
 
+	// Approve button variables
 	let isApproving: boolean = $state(false);
 	let approveBtnDynamicClasses: string = $state(disabledBtnClasses);
 	let approveButtonDisabled: boolean = $state(true);
@@ -56,15 +58,19 @@
 	let isConfirming: boolean = $state(false);
 	let confirmBtnDynamicClasses: string = $state(disabledBtnClasses);
 
+	// User input amounts for each token
 	let token1Amount: number | null = $state(null);
 	let token2Amount: number | null = $state(null);
 
+	// User selected token tickers
 	let selectedTicker1: TokenTickers | null = $state(null);
 	let selectedTicker2: TokenTickers | null = $state(null);
 
+	// User selected token information
 	let token1Info: TokenInfo | null = $state(null);
 	let token2Info: TokenInfo | null = $state(null);
 
+	// User liquidity data for the pair of tokens that he selected
 	let userLiquidityData: PoolField[] = $state([
 		{
 			title: 'Your total pool tokens:',
@@ -92,8 +98,10 @@
 	//** Page functions **//
 	//**************************************************//
 	const loadhUserLiquidity = async () => {
+		if (!$walletConnected || !token1Info || !token2Info) return;
 		isLoadingLiquidity = true;
-		if ($walletConnected && token1Info && token2Info) {
+
+		try {
 			let result = await fetchUserLiquidity(
 				PUBLIC_DEXER_V2_FACTORY_ADDR,
 				token1Info.address,
@@ -104,17 +112,34 @@
 			// default user liquidity info will be displayed
 			if (result === null) return;
 
-			if (result === false) {
-				console.log('Error occured while fetching user liquidity');
-				return;
-			}
-
-			// TODO: Update user liquidity data to represent it in the UI
-			console.log(
-				'No error occured while fetching user liquidity and the selected token pair contract already exsists'
-			);
+			userLiquidityData = [
+				{
+					title: 'Your total pool tokens:',
+					value: result.poolTokenBalance,
+					img: null
+				},
+				{
+					title: `Pooled ${token1Info.ticker}:`,
+					value: result.pooledToken1,
+					img: token1Info.imgPath
+				},
+				{
+					title: `Pooled ${token2Info.ticker}:`,
+					value: result.pooledToken2,
+					img: token2Info.imgPath
+				},
+				{
+					title: 'Your pool share:',
+					value: `${result.poolShare}%`,
+					img: null
+				}
+			];
+		} catch (e) {
+			console.error('Error occured while loading user liquidity:', e);
+		} finally {
+			liquidityLoaded = true;
+			isLoadingLiquidity = false;
 		}
-		isLoadingLiquidity = false;
 	};
 
 	const approveSelectedTokens = async () => {
@@ -124,23 +149,12 @@
 
 		try {
 			// Approve token1
-			let token1Result = await approveTokens(
-				token1Info,
-				PUBLIC_DEXER_V2_ROUTER_ADDR,
-				token1Amount.toString()
-			);
-
-			if (token1Result != null) return;
+			// Will throw an AppError if any occured
+			await approveTokens(token1Info, PUBLIC_DEXER_V2_ROUTER_ADDR, token1Amount.toString());
 
 			// Approve token2
-			let token2Result = await approveTokens(
-				token2Info,
-				PUBLIC_DEXER_V2_ROUTER_ADDR,
-				token2Amount.toString()
-			);
-
-			// NOTE: should I do anything if approval fails?
-			if (token2Result != null) return;
+			// Will throw an AppError if any occured
+			await approveTokens(token2Info, PUBLIC_DEXER_V2_ROUTER_ADDR, token2Amount.toString());
 
 			isApproved = true;
 		} catch (e) {
@@ -156,12 +170,9 @@
 		isConfirming = true;
 
 		try {
-			let result = await addLiquidity(token1Amount, token1Info, token2Amount, token2Info);
+			await addLiquidity(token1Amount, token1Info, token2Amount, token2Info);
 
-			if (result != null) {
-				console.log('Something failed...');
-				return;
-			}
+			// TODO: show modal that everything went well
 
 			// Reset everything in case of success
 			isApproved = false;
@@ -170,6 +181,7 @@
 			selectedTicker1 = null;
 			selectedTicker2 = null;
 		} catch (error) {
+			// TODO: show fail modal
 			console.error('An error occurred:', error);
 		} finally {
 			isConfirming = false;
@@ -182,15 +194,21 @@
 	$effect(() => {
 		// Set token info for token 1 when selected
 		token1Info = selectedTicker1 ? availableTokens[selectedTicker1] : null;
+
+		// Reset loaded liquidity
+		liquidityLoaded = false;
 	});
 
 	$effect(() => {
 		// Set token info for token 2 when selected
 		token2Info = selectedTicker2 ? availableTokens[selectedTicker2] : null;
+
+		// Reset loaded liquidity
+		liquidityLoaded = false;
 	});
 
 	$effect(() => {
-		if (token1Info && token2Info) {
+		if (token1Info && token2Info && !liquidityLoaded) {
 			// Update user liquidity data (data of the token 1) when both tokens selected
 			userLiquidityData[1].img = token1Info.imgPath;
 			userLiquidityData[1].title = `Pooled ${token1Info.ticker}:`;
