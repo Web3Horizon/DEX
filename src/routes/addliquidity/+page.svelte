@@ -1,17 +1,60 @@
 <script lang="ts">
+	//**************************************************//
+	//** Environment imports **//
+	//**************************************************//
+	import { PUBLIC_DEXER_V2_FACTORY_ADDR, PUBLIC_DEXER_V2_ROUTER_ADDR } from '$env/static/public';
+
+	//**************************************************//
+	//** Image imports **//
+	//**************************************************//
 	import LiquidityMonsterImage from '$lib/assets/img/liquidity_monster.png';
+
+	//**************************************************//
+	//** Components imports **//
+	//**************************************************//
 	import { TokenInput } from '$lib/components';
 	import ConnectWallet from '$lib/components/buttons/ConnectWallet.svelte';
+
+	//**************************************************//
+	//** Other imports from library **//
+	//**************************************************//
 	import { availableTokens } from '$lib/constants/availableTokens';
+	import { fetchUserLiquidity } from '$lib/scripts/liquidity/fetchUserLiquidity';
 	import { walletConnected } from '$lib/stores/wallet';
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
+	import { approveTokens } from '$lib/scripts/liquidity/approveToken';
+	import { addLiquidity } from '$lib/scripts/liquidity/addLiquidity';
 
+	//**************************************************//
+	//** Local types **//
+	//**************************************************//
 	type PoolField = {
 		title: string;
 		value: string;
 		img: string | null;
 	};
+
+	//**************************************************//
+	//** Local constants **//
+	//**************************************************//
+	const disabledBtnClasses: string = 'cursor-not-allowed border-gray-500' as const;
+	const enabledBtnClasses: string =
+		'cursor-pointer border-app_pink hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink' as const;
+
+	//**************************************************//
+	//** Local variables **//
+	//**************************************************//
+	let isLoadingLiquidity: boolean = $state(false);
+
+	let isApproving: boolean = $state(false);
+	let approveBtnDynamicClasses: string = $state(disabledBtnClasses);
+	let approveButtonDisabled: boolean = $state(true);
+	let isApproved: boolean = $state(false);
+
+	// Confirm button variables
+	let isConfirming: boolean = $state(false);
+	let confirmBtnDynamicClasses: string = $state(disabledBtnClasses);
 
 	let token1Amount: number | null = $state(null);
 	let token2Amount: number | null = $state(null);
@@ -22,51 +65,156 @@
 	let token1Info: TokenInfo | null = $state(null);
 	let token2Info: TokenInfo | null = $state(null);
 
-	let userPoolData: PoolField[] = $state([
+	let userLiquidityData: PoolField[] = $state([
 		{
 			title: 'Your total pool tokens:',
-			value: '1.1',
+			value: '0.0',
 			img: null
 		},
 		{
 			title: '',
-			value: '',
+			value: '0.0',
 			img: null
 		},
 		{
 			title: '',
-			value: '',
+			value: '0.0',
 			img: null
 		},
 		{
 			title: 'Your pool share:',
-			value: '0.05%',
+			value: '0.0%',
 			img: null
 		}
 	]);
 
+	//**************************************************//
+	//** Page functions **//
+	//**************************************************//
+	const loadhUserLiquidity = async () => {
+		isLoadingLiquidity = true;
+		if ($walletConnected && token1Info && token2Info) {
+			let result = await fetchUserLiquidity(
+				PUBLIC_DEXER_V2_FACTORY_ADDR,
+				token1Info.address,
+				token2Info.address
+			);
+
+			// Case when there is no error but no selected token pair contract yet exsists
+			// default user liquidity info will be displayed
+			if (result === null) return;
+
+			if (result === false) {
+				console.log('Error occured while fetching user liquidity');
+				return;
+			}
+
+			// TODO: Update user liquidity data to represent it in the UI
+			console.log(
+				'No error occured while fetching user liquidity and the selected token pair contract already exsists'
+			);
+		}
+		isLoadingLiquidity = false;
+	};
+
+	const approveSelectedTokens = async () => {
+		if (!token1Info || !token2Info || !token1Amount || !token2Amount) return;
+
+		isApproving = true;
+
+		try {
+			// Approve token1
+			let token1Result = await approveTokens(
+				token1Info,
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token1Amount.toString()
+			);
+
+			if (token1Result != null) return;
+
+			// Approve token2
+			let token2Result = await approveTokens(
+				token2Info,
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token2Amount.toString()
+			);
+
+			// NOTE: should I do anything if approval fails?
+			if (token2Result != null) return;
+
+			isApproved = true;
+		} catch (e) {
+			console.error(e);
+		} finally {
+			isApproving = false;
+		}
+	};
+
+	const confirmAddLiquidity = async () => {
+		if (!token1Info || !token2Info || !token1Amount || !token2Amount) return;
+
+		isConfirming = true;
+
+		try {
+			let result = await addLiquidity(token1Amount, token1Info, token2Amount, token2Info);
+
+			if (result != null) {
+				console.log('Something failed...');
+				return;
+			}
+
+			// Reset everything in case of success
+			isApproved = false;
+			token1Amount = null;
+			token2Amount = null;
+			selectedTicker1 = null;
+			selectedTicker2 = null;
+		} catch (error) {
+			console.error('An error occurred:', error);
+		} finally {
+			isConfirming = false;
+		}
+	};
+
+	//**************************************************//
+	//** Page effects **//
+	//**************************************************//
 	$effect(() => {
-		if (token1Info) {
-			userPoolData[1].title = `Pooled ${token1Info.ticker}:`;
-			userPoolData[1].value = '12.3';
-			userPoolData[1].img = token1Info.imgPath;
+		// Set token info for token 1 when selected
+		token1Info = selectedTicker1 ? availableTokens[selectedTicker1] : null;
+	});
+
+	$effect(() => {
+		// Set token info for token 2 when selected
+		token2Info = selectedTicker2 ? availableTokens[selectedTicker2] : null;
+	});
+
+	$effect(() => {
+		if (token1Info && token2Info) {
+			// Update user liquidity data (data of the token 1) when both tokens selected
+			userLiquidityData[1].img = token1Info.imgPath;
+			userLiquidityData[1].title = `Pooled ${token1Info.ticker}:`;
+
+			// Update user liquidity data (data of the token 2) when both tokens selected
+			userLiquidityData[2].img = token2Info.imgPath;
+			userLiquidityData[2].title = `Pooled ${token2Info.ticker}:`;
+
+			// Load user liquidity data from blcokchain
+			loadhUserLiquidity();
 		}
 	});
 
 	$effect(() => {
-		if (token2Info) {
-			userPoolData[2].title = `Pooled ${token2Info.ticker}:`;
-			userPoolData[2].value = '174.909';
-			userPoolData[2].img = token2Info.imgPath;
-		}
+		approveButtonDisabled =
+			isApproving || !token1Amount || !token2Amount || !token1Info || !token2Info;
+
+		approveBtnDynamicClasses = approveButtonDisabled ? disabledBtnClasses : enabledBtnClasses;
 	});
 
 	$effect(() => {
-		if (selectedTicker1) token1Info = availableTokens[selectedTicker1];
-	});
-
-	$effect(() => {
-		if (selectedTicker2) token2Info = availableTokens[selectedTicker2];
+		// Dynamically set classes to 'Confirm' button dependently on whether if it is
+		// disabled or not
+		confirmBtnDynamicClasses = isConfirming ? disabledBtnClasses : enabledBtnClasses;
 	});
 </script>
 
@@ -127,7 +275,7 @@
 						</div>
 					</div>
 					<div class="flex flex-col gap-2.5 rounded-3xl border border-app_pink px-3 py-8 text-base">
-						{#each userPoolData as poolField}
+						{#each userLiquidityData as poolField}
 							<div class="flex justify-between">
 								<p>{poolField.title}</p>
 								{#if poolField.img}
@@ -153,11 +301,31 @@
 		<!-- Box action button -->
 		<!-------------------------------------------------->
 		{#if $walletConnected}
-			<button
-				class="rounded-full border-3 border-app_pink bg-transparent px-10 py-2.5 text-base font-bold capitalize transition-all duration-300 hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink"
-			>
-				approve
-			</button>
+			{#if isApproved}
+				<button
+					class="{confirmBtnDynamicClasses} rounded-full border-3 bg-transparent px-10 py-2.5 text-base font-bold capitalize transition-all duration-300"
+					onclick={confirmAddLiquidity}
+					disabled={isConfirming}
+				>
+					{#if isConfirming}
+						loading...
+					{:else}
+						confirm
+					{/if}
+				</button>
+			{:else}
+				<button
+					class="{approveBtnDynamicClasses} rounded-full border-3 bg-transparent px-10 py-2.5 text-base font-bold capitalize transition-all duration-300"
+					disabled={approveButtonDisabled}
+					onclick={approveSelectedTokens}
+				>
+					{#if !isApproving}
+						approve
+					{:else}
+						loading...
+					{/if}
+				</button>
+			{/if}
 		{:else}
 			<ConnectWallet />
 		{/if}

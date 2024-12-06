@@ -8,20 +8,32 @@
 		amount: number | null;
 	};
 
+	const disabledInputClasses: string = 'cursor-not-allowed';
+	const enabledInputClasses: string = 'cursor-text';
+
 	let {
 		selectedTicker = $bindable(null),
 		tickerToExclude = $bindable(null),
 		amount = $bindable(null)
 	}: ComponentProps = $props();
+
+	let inputDisabled: boolean = $state(true);
+	let inputDynamicClasses: string = $state(disabledInputClasses);
+
+	$effect(() => {
+		inputDisabled = selectedTicker === null ? true : false;
+		inputDynamicClasses = inputDisabled ? disabledInputClasses : enabledInputClasses;
+	});
 </script>
 
 <div class="flex justify-between gap-6 rounded-4xl border-3 border-app_pink px-6 py-4">
 	<div class="flex flex-1 flex-col gap-3">
 		<span class="text-xl font-normal capitalize opacity-50">amount</span>
 		<input
+			disabled={inputDisabled}
 			type="number"
 			placeholder="0"
-			class="w-full max-w-64 bg-transparent text-4xl outline-none"
+			class="w-full max-w-64 bg-transparent text-4xl outline-none {inputDynamicClasses}"
 			bind:value={amount}
 		/>
 		<div class="flex items-center justify-start gap-2">
