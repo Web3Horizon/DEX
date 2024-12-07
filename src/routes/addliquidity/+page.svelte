@@ -25,6 +25,9 @@
 	import type { TokenInfo } from '$lib/types/tokens/Token';
 	import { approveTokens } from '$lib/scripts/liquidity/approveToken';
 	import { addLiquidity } from '$lib/scripts/liquidity/addLiquidity';
+	import type { UserLiquidity } from '$lib/constants/userLiquidity';
+	import { fade } from 'svelte/transition';
+	import Icon from '@iconify/svelte';
 
 	//**************************************************//
 	//** Local types **//
@@ -43,7 +46,7 @@
 		'cursor-pointer border-app_pink hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink' as const;
 
 	//**************************************************//
-	//** Local variables **//
+	//** Local state variables **//
 	//**************************************************//
 	let isLoadingLiquidity: boolean = $state(false);
 	let liquidityLoaded: boolean = $state(false);
@@ -99,41 +102,32 @@
 	//**************************************************//
 	const loadhUserLiquidity = async () => {
 		if (!$walletConnected || !token1Info || !token2Info) return;
+
 		isLoadingLiquidity = true;
 
 		try {
-			let result = await fetchUserLiquidity(
+			let result: UserLiquidity | null = await fetchUserLiquidity(
 				PUBLIC_DEXER_V2_FACTORY_ADDR,
-				token1Info.address,
-				token2Info.address
+				token1Info,
+				token2Info
 			);
 
 			// Case when there is no error but no selected token pair contract yet exsists
 			// default user liquidity info will be displayed
-			if (result === null) return;
+			if (result === null) {
+				for (let i = 0; i < userLiquidityData.length; i++) {
+					const element = userLiquidityData[i];
 
-			userLiquidityData = [
-				{
-					title: 'Your total pool tokens:',
-					value: result.poolTokenBalance,
-					img: null
-				},
-				{
-					title: `Pooled ${token1Info.ticker}:`,
-					value: result.pooledToken1,
-					img: token1Info.imgPath
-				},
-				{
-					title: `Pooled ${token2Info.ticker}:`,
-					value: result.pooledToken2,
-					img: token2Info.imgPath
-				},
-				{
-					title: 'Your pool share:',
-					value: `${result.poolShare}%`,
-					img: null
+					element.title === 'Your pool share:' ? (element.value = '0%') : (element.value = '0');
 				}
-			];
+				return;
+			}
+
+			// Update user liquidity data (values of the fileds) if pair exists
+			userLiquidityData[0].value = formatNumber(Number(result.poolTokenAmount), 3);
+			userLiquidityData[1].value = formatNumber(Number(result.token1.pooledAmount), 3);
+			userLiquidityData[2].value = formatNumber(Number(result.token2.pooledAmount), 3);
+			userLiquidityData[3].value = `${formatNumber(Number(result.poolShare), 2)}%`;
 		} catch (e) {
 			console.error('Error occured while loading user liquidity:', e);
 		} finally {
@@ -209,13 +203,12 @@
 
 	$effect(() => {
 		if (token1Info && token2Info && !liquidityLoaded) {
-			// Update user liquidity data (data of the token 1) when both tokens selected
-			userLiquidityData[1].img = token1Info.imgPath;
+			// Explisitly update user liquidity data (title and image of the both tokens) when both tokens selected
 			userLiquidityData[1].title = `Pooled ${token1Info.ticker}:`;
-
-			// Update user liquidity data (data of the token 2) when both tokens selected
-			userLiquidityData[2].img = token2Info.imgPath;
 			userLiquidityData[2].title = `Pooled ${token2Info.ticker}:`;
+
+			userLiquidityData[1].img = token1Info.imgPath;
+			userLiquidityData[2].img = token2Info.imgPath;
 
 			// Load user liquidity data from blcokchain
 			loadhUserLiquidity();
@@ -231,9 +224,23 @@
 
 	$effect(() => {
 		// Dynamically set classes to 'Confirm' button dependently on whether if it is
-		// disabled or not
+		// in process of confirming or not
 		confirmBtnDynamicClasses = isConfirming ? disabledBtnClasses : enabledBtnClasses;
 	});
+
+	//**************************************************//
+	//** Helper functions **//
+	//**************************************************//
+	function formatNumber(value: number, maxDecimals: number) {
+		const valueString = value.toString();
+		if (valueString.includes('.')) {
+			const [integerPart, decimalPart] = valueString.split('.');
+			if (decimalPart.length > maxDecimals) {
+				return `${integerPart}.${decimalPart.slice(0, maxDecimals)}`;
+			}
+		}
+		return valueString;
+	}
 </script>
 
 <section class="flex flex-col justify-center px-36 pt-32">
@@ -278,10 +285,13 @@
 			</div>
 
 			<!-------------------------------------------------->
-			<!-- Right side of the box, tokens and pool info -->
+			<!-- Right side of the box, tokens and user liquidity info -->
 			<!-------------------------------------------------->
 			{#if token1Info && token2Info}
 				<div class="flex flex-col gap-12">
+					<!-------------------------------------------------->
+					<!-- Tokens -->
+					<!-------------------------------------------------->
 					<div class="flex justify-between">
 						<div class="flex flex-col items-center">
 							<img src={token1Info.imgPath} class="h-full max-w-28" alt="" />
@@ -292,13 +302,24 @@
 							<div class="text-3xl font-bold">{token2Info.ticker}</div>
 						</div>
 					</div>
+
+					<!-------------------------------------------------->
+					<!-- User liquidity info -->
+					<!-------------------------------------------------->
 					<div class="flex flex-col gap-2.5 rounded-3xl border border-app_pink px-3 py-8 text-base">
 						{#each userLiquidityData as poolField}
 							<div class="flex justify-between">
 								<p>{poolField.title}</p>
-								{#if poolField.img}
+								{#if isLoadingLiquidity}
+									<Icon
+										icon="line-md:loading-twotone-loop"
+										width={16}
+										height={16}
+										class="text-white"
+									/>
+								{:else if poolField.img}
 									<div class="flex gap-1">
-										<span class="">{poolField.value}</span>
+										<span>{poolField.value}</span>
 										<img src={poolField.img} alt={poolField.title} class="h-5 w-auto" />
 									</div>
 								{:else}
@@ -309,6 +330,9 @@
 					</div>
 				</div>
 			{:else if (!token1Info || !token2Info) && $walletConnected}
+				<!-------------------------------------------------->
+				<!-- Represent message if no token is selected -->
+				<!-------------------------------------------------->
 				<div class="flex items-center justify-center">
 					<span class=" text-2xl">Select tokens to add liquidity</span>
 				</div>
@@ -349,3 +373,7 @@
 		{/if}
 	</div>
 </section>
+
+<!-- TODO: add user liquidity types here and try to make as much type declarations as possible -->
+<!-- TODO: get pool ratio if pair already exsists -->
+<!-- TODO: ... -->

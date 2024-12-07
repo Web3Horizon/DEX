@@ -1,60 +1,22 @@
-// import { ethers } from 'ethers';
-// import factoryAbi from '$lib/constants/abi/DexerV2Factory';
-// import { AppError, isAppError } from '$lib/types/AppError';
-// import getBrowserProvider from '../helpers/getBrowserProvider';
-
-// export async function getPairAddress(
-// 	factoryAddress: string,
-// 	token1Addr: string,
-// 	token2Addr: string,
-// 	provider: ethers.Provider
-// ): Promise<string> {
-// 	const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, provider);
-// 	return await factoryContract.pairs(token1Addr, token2Addr);
-// }
-
-// export async function fetchUserLiquidity(
-// 	factoryAddr: string,
-// 	token1Addr: string,
-// 	token2Addr: string
-// ): Promise<null> {
-// 	try {
-// 		let provider = getBrowserProvider();
-
-// 		// Fetch address of the selected pair contract
-// 		const pairAddr = await getPairAddress(factoryAddr, token1Addr, token2Addr, provider);
-
-// 		if (pairAddr === ethers.ZeroAddress) {
-// 			// If no pair address exists just return
-// 			// Default user liquidity data will be represented
-// 			return null;
-// 		}
-
-// 		// TODO: Fetch user liquidity
-
-// 		// TODO: return actual user liquidity data
-
-// 		// NOTE: temporary!
-// 		return null;
-// 	} catch (e: any) {
-// 		if (isAppError(e)) {
-// 			throw e;
-// 		} else {
-// 			throw new AppError(
-// 				'Unexpected error occured while fetching user liquidity data:',
-// 				e.toString()
-// 			);
-// 		}
-// 	}
-// }
-
+//**************************************************//
+//** Third-party package imports **//
+//**************************************************//
 import { ethers } from 'ethers';
+
+//**************************************************//
+//** ABI imports **//
+//**************************************************//
 import factoryAbi from '$lib/constants/abi/DexerV2Factory';
 import pairAbi from '$lib/constants/abi/DexerV2Pair';
-import erc20Abi from '$lib/constants/abi/ERC20Approve'; // ERC20 ABI
+import erc20Abi from '$lib/constants/abi/ERC20Approve';
 
+//**************************************************//
+//** Other library imports **//
+//**************************************************//
 import { AppError, isAppError } from '$lib/types/AppError';
-import getBrowserProvider from '../helpers/getBrowserProvider';
+import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
+import type { TokenInfo } from '$lib/types/tokens/Token';
+import type { PooledTokenDetails, UserLiquidity } from '$lib/constants/userLiquidity';
 
 export async function getPairAddress(
 	factoryAddress: string,
@@ -68,56 +30,71 @@ export async function getPairAddress(
 
 export async function fetchUserLiquidity(
 	factoryAddr: string,
-	token1Addr: string,
-	token2Addr: string
-): Promise<{
-	poolTokenBalance: string;
-	pooledToken1: string;
-	pooledToken2: string;
-	poolShare: string;
-} | null> {
-	console.log('hello');
+	token1Info: TokenInfo,
+	token2Info: TokenInfo
+): Promise<UserLiquidity | null> {
 	try {
 		const provider = getBrowserProvider();
 
 		// Fetch pair address
-		const pairAddr = await getPairAddress(factoryAddr, token1Addr, token2Addr, provider);
+		const pairAddr = await getPairAddress(
+			factoryAddr,
+			token1Info.address,
+			token2Info.address,
+			provider
+		);
 
 		// Check if the pair exists
 		if (pairAddr === ethers.ZeroAddress) {
-			return null; // No pool exists
+			return null; // If no pair exsists = no pool exists
 		}
 
 		let signer = await provider.getSigner();
 		let userAddr = await signer.getAddress();
 
 		const pairContract = new ethers.Contract(pairAddr, pairAbi, provider);
-		const token1Contract = new ethers.Contract(token1Addr, erc20Abi, provider);
-		const token2Contract = new ethers.Contract(token2Addr, erc20Abi, provider);
+		const token1Contract = new ethers.Contract(token1Info.address, erc20Abi, provider);
+		const token2Contract = new ethers.Contract(token2Info.address, erc20Abi, provider);
+		//
 
 		// Fetch reserves and total supply
-		const [reserve0, reserve1] = await pairContract.getReserves();
-		const totalSupply = await pairContract.totalSupply();
+		const [reserve0, reserve1]: bigint[] = await pairContract.getReserves();
+		const totalSupply: bigint = await pairContract.totalSupply();
+
+		let [token1Decimals, token2Decimals, pairTokenDecimals] = await Promise.all([
+			token1Contract.decimals(),
+			token2Contract.decimals(),
+			pairContract.decimals()
+		]);
 
 		// Fetch user LP token balance
-		const poolTokenBalance = await pairContract.balanceOf(userAddr);
+		const poolTokenBalance: bigint = await pairContract.balanceOf(userAddr);
 
 		// Calculate pool share
-		const poolShare = (poolTokenBalance * 100n) / totalSupply;
-		const poolShareFormatted = Number(poolShare).toFixed(2);
+		const poolShare = ((poolTokenBalance * 100n) / totalSupply).toString();
 
 		// Calculate pooled amounts
-		const pooledToken1 = (reserve0 * poolTokenBalance) / totalSupply;
-		const pooledToken2 = (reserve1 * poolTokenBalance) / totalSupply;
+		const pooledToken1AmountRaw: bigint = (reserve0 * poolTokenBalance) / totalSupply;
+		const pooledToken2AmountRaw: bigint = (reserve1 * poolTokenBalance) / totalSupply;
 
-		// Convert to number for formatting
+		// Format pooled token amounts
+		let pooledToken1Amount: string = ethers.formatUnits(pooledToken1AmountRaw, token1Decimals);
+		let pooledToken2Amount: string = ethers.formatUnits(pooledToken2AmountRaw, token2Decimals);
 
-		// Return poolShare as a string with a "%" appended
+		const token1: PooledTokenDetails = {
+			ticker: token1Info.ticker,
+			pooledAmount: pooledToken1Amount
+		};
+		const token2: PooledTokenDetails = {
+			ticker: token2Info.ticker,
+			pooledAmount: pooledToken2Amount
+		};
+
 		return {
-			poolTokenBalance: ethers.formatUnits(poolTokenBalance, 18),
-			pooledToken1: ethers.formatUnits(pooledToken1, await token1Contract.decimals()),
-			pooledToken2: ethers.formatUnits(pooledToken2, await token2Contract.decimals()),
-			poolShare: poolShareFormatted
+			poolTokenAmount: ethers.formatUnits(poolTokenBalance, pairTokenDecimals),
+			poolShare: poolShare,
+			token1,
+			token2
 		};
 	} catch (error: any) {
 		if (isAppError(error)) {
