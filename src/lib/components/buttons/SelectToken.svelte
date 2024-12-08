@@ -7,6 +7,7 @@
 	import Search from '$lib/assets/icons/Search.svelte';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
+	import { tick } from 'svelte';
 
 	//**************************************************//
 	//** Local types **//
@@ -14,6 +15,7 @@
 	type ComponentProps = {
 		selectedTicker: TokenTickers | null;
 		tickerToExclude: TokenTickers | null;
+		onSelectTicker: (() => Promise<void>) | null;
 	};
 
 	//**************************************************//
@@ -21,8 +23,11 @@
 	//**************************************************//
 
 	// Component props passed to the component
-	let { selectedTicker = $bindable(null), tickerToExclude = $bindable(null) }: ComponentProps =
-		$props();
+	let {
+		selectedTicker = $bindable(null),
+		tickerToExclude = $bindable(null),
+		onSelectTicker = null
+	}: ComponentProps = $props();
 
 	let selectedTokenInfo: TokenInfo | null = $state(null);
 
@@ -54,9 +59,14 @@
 	};
 
 	// Handle token selection and close modal
-	const selectToken = (ticker: TokenTickers) => {
+	const selectToken = async (ticker: TokenTickers) => {
 		selectedTicker = ticker;
 		isModalOpen = false;
+
+		await tick();
+		if (onSelectTicker) {
+			await onSelectTicker();
+		}
 	};
 
 	//**************************************************//

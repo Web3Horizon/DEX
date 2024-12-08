@@ -1,5 +1,10 @@
 <script lang="ts">
 	//**************************************************//
+	//** Package imports **//
+	//**************************************************//
+	import Icon from '@iconify/svelte';
+
+	//**************************************************//
 	//** Environment imports **//
 	//**************************************************//
 	import { PUBLIC_DEXER_V2_FACTORY_ADDR, PUBLIC_DEXER_V2_ROUTER_ADDR } from '$env/static/public';
@@ -19,15 +24,14 @@
 	//** Other imports from library **//
 	//**************************************************//
 	import { availableTokens } from '$lib/constants/availableTokens';
-	import { fetchUserLiquidity } from '$lib/scripts/liquidity/fetchUserLiquidity';
+	import type { UserLiquidity } from '$lib/constants/userLiquidity';
+	import fetchUserLiquidity from '$lib/scripts/liquidity/fetchUserLiquidity';
+	import { approveTokens } from '$lib/scripts/liquidity/approveToken';
+	import { addLiquidity } from '$lib/scripts/liquidity/addLiquidity';
 	import { walletConnected } from '$lib/stores/wallet';
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
-	import { approveTokens } from '$lib/scripts/liquidity/approveToken';
-	import { addLiquidity } from '$lib/scripts/liquidity/addLiquidity';
-	import type { UserLiquidity } from '$lib/constants/userLiquidity';
-	import { fade } from 'svelte/transition';
-	import Icon from '@iconify/svelte';
+	import getPairReserves from '$lib/scripts/tokens/getPairReserves';
 
 	//**************************************************//
 	//** Local types **//
@@ -49,7 +53,6 @@
 	//** Local state variables **//
 	//**************************************************//
 	let isLoadingLiquidity: boolean = $state(false);
-	let liquidityLoaded: boolean = $state(false);
 
 	// Approve button variables
 	let isApproving: boolean = $state(false);
@@ -65,6 +68,9 @@
 	let token1Amount: number | null = $state(null);
 	let token2Amount: number | null = $state(null);
 
+	// Selected tokens ratio
+	let tokensRatio: number | null = $state(null);
+
 	// User selected token tickers
 	let selectedTicker1: TokenTickers | null = $state(null);
 	let selectedTicker2: TokenTickers | null = $state(null);
@@ -73,26 +79,29 @@
 	let token1Info: TokenInfo | null = $state(null);
 	let token2Info: TokenInfo | null = $state(null);
 
+	let liquidityLoadingAbortController: AbortController | null = $state(null);
+	let tokenRatioAbortController: AbortController | null = $state(null);
+
 	// User liquidity data for the pair of tokens that he selected
 	let userLiquidityData: PoolField[] = $state([
 		{
 			title: 'Your total pool tokens:',
-			value: '0.0',
+			value: '0',
 			img: null
 		},
 		{
 			title: '',
-			value: '0.0',
+			value: '0',
 			img: null
 		},
 		{
 			title: '',
-			value: '0.0',
+			value: '0',
 			img: null
 		},
 		{
 			title: 'Your pool share:',
-			value: '0.0%',
+			value: '0%',
 			img: null
 		}
 	]);
@@ -100,8 +109,43 @@
 	//**************************************************//
 	//** Page functions **//
 	//**************************************************//
-	const loadhUserLiquidity = async () => {
+	const loadTokenRatio = async () => {
+		if (!token1Info || !token2Info) return;
+
+		if (tokenRatioAbortController) tokenRatioAbortController.abort();
+
+		tokenRatioAbortController = new AbortController();
+		const { signal } = new AbortController();
+
+		const reserves = await getPairReserves(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR);
+
+		if (signal.aborted) return;
+
+		if (!reserves) {
+			tokensRatio = null;
+			return null;
+		}
+
+		tokensRatio = Number(reserves.reserve1) / Number(reserves.reserve2);
+		return tokensRatio;
+	};
+
+	const loadUserLiquidity = async () => {
 		if (!$walletConnected || !token1Info || !token2Info) return;
+
+		// Abort any ongoing operation before starting a new one
+		if (liquidityLoadingAbortController) liquidityLoadingAbortController.abort();
+
+		// Create a new AbortController instance for this operation
+		liquidityLoadingAbortController = new AbortController();
+
+		const { signal } = liquidityLoadingAbortController;
+
+		// Explicitly update user liquidity data (title and image of both tokens) when both tokens are selected
+		userLiquidityData[1].title = `Pooled ${token1Info.ticker}:`;
+		userLiquidityData[2].title = `Pooled ${token2Info.ticker}:`;
+		userLiquidityData[1].img = token1Info.imgPath;
+		userLiquidityData[2].img = token2Info.imgPath;
 
 		isLoadingLiquidity = true;
 
@@ -112,27 +156,27 @@
 				token2Info
 			);
 
-			// Case when there is no error but no selected token pair contract yet exsists
-			// default user liquidity info will be displayed
-			if (result === null) {
-				for (let i = 0; i < userLiquidityData.length; i++) {
-					const element = userLiquidityData[i];
+			// Check if the signal was aborted after the operation
+			if (signal.aborted) return;
 
-					element.title === 'Your pool share:' ? (element.value = '0%') : (element.value = '0');
-				}
+			// Case when there is no error but no selected token pair contract yet exists
+			if (result === null) {
+				userLiquidityData = userLiquidityData.map((field, index) =>
+					index === 3 ? { ...field, value: '0%' } : { ...field, value: '0' }
+				);
 				return;
 			}
 
-			// Update user liquidity data (values of the fileds) if pair exists
+			// Update user liquidity data (values of the fields) if pair exists
 			userLiquidityData[0].value = formatNumber(Number(result.poolTokenAmount), 3);
 			userLiquidityData[1].value = formatNumber(Number(result.token1.pooledAmount), 3);
 			userLiquidityData[2].value = formatNumber(Number(result.token2.pooledAmount), 3);
 			userLiquidityData[3].value = `${formatNumber(Number(result.poolShare), 2)}%`;
 		} catch (e) {
-			console.error('Error occured while loading user liquidity:', e);
+			console.error('Error occurred while loading user liquidity:', e);
 		} finally {
-			liquidityLoaded = true;
-			isLoadingLiquidity = false;
+			// Check if signal was aborted before updating the loading state
+			if (!signal.aborted) isLoadingLiquidity = false;
 		}
 	};
 
@@ -169,11 +213,7 @@
 			// TODO: show modal that everything went well
 
 			// Reset everything in case of success
-			isApproved = false;
-			token1Amount = null;
-			token2Amount = null;
-			selectedTicker1 = null;
-			selectedTicker2 = null;
+			resetOnConfirmed();
 		} catch (error) {
 			// TODO: show fail modal
 			console.error('An error occurred:', error);
@@ -183,38 +223,46 @@
 	};
 
 	//**************************************************//
-	//** Page effects **//
+	//** Page functions **//
 	//**************************************************//
-	$effect(() => {
-		// Set token info for token 1 when selected
-		token1Info = selectedTicker1 ? availableTokens[selectedTicker1] : null;
+	const onToken1Input = () => {
+		if (token1Amount && token1Amount <= 0) token1Amount = 0;
 
-		// Reset loaded liquidity
-		liquidityLoaded = false;
-	});
+		if (!tokensRatio) return;
 
-	$effect(() => {
-		// Set token info for token 2 when selected
-		token2Info = selectedTicker2 ? availableTokens[selectedTicker2] : null;
-
-		// Reset loaded liquidity
-		liquidityLoaded = false;
-	});
-
-	$effect(() => {
-		if (token1Info && token2Info && !liquidityLoaded) {
-			// Explisitly update user liquidity data (title and image of the both tokens) when both tokens selected
-			userLiquidityData[1].title = `Pooled ${token1Info.ticker}:`;
-			userLiquidityData[2].title = `Pooled ${token2Info.ticker}:`;
-
-			userLiquidityData[1].img = token1Info.imgPath;
-			userLiquidityData[2].img = token2Info.imgPath;
-
-			// Load user liquidity data from blcokchain
-			loadhUserLiquidity();
+		if (!token1Amount) {
+			token2Amount = null;
+			return;
 		}
-	});
 
+		token2Amount = token1Amount * tokensRatio;
+	};
+
+	const onToken2Input = () => {
+		if (token2Amount && token2Amount <= 0) token2Amount = 0;
+
+		if (!tokensRatio) return;
+
+		if (!token2Amount) {
+			token1Amount = null;
+			return;
+		}
+
+		token1Amount = token2Amount / tokensRatio;
+	};
+
+	const onSelectTicker = async () => {
+		if (!selectedTicker1 || !selectedTicker2 || !walletConnected) return;
+
+		token1Info = availableTokens[selectedTicker1];
+		token2Info = availableTokens[selectedTicker2];
+
+		resetOnNewTickerSelected();
+
+		await Promise.all([loadTokenRatio(), loadUserLiquidity()]);
+	};
+
+	// Effects on approve button when user changes his inputs
 	$effect(() => {
 		approveButtonDisabled =
 			isApproving || !token1Amount || !token2Amount || !token1Info || !token2Info;
@@ -222,6 +270,7 @@
 		approveBtnDynamicClasses = approveButtonDisabled ? disabledBtnClasses : enabledBtnClasses;
 	});
 
+	// Effects when "Confirm" button is clicked
 	$effect(() => {
 		// Dynamically set classes to 'Confirm' button dependently on whether if it is
 		// in process of confirming or not
@@ -241,6 +290,49 @@
 		}
 		return valueString;
 	}
+
+	const resetOnConfirmed = () => {
+		// Reset ratio
+		tokensRatio = null;
+
+		// Reset amounts
+		token1Amount = null;
+		token2Amount = null;
+
+		// Reset tickers
+		selectedTicker1 = null;
+		selectedTicker2 = null;
+
+		// Reset token info
+		token1Info = null;
+		token2Info = null;
+
+		// Reset 'Approved'
+		isApproved = false;
+
+		// Effects on user liquidity
+		// Reset pooled tokens
+		userLiquidityData[0].value = '0';
+
+		// Reset data of tokens
+		for (let i = 1; i <= 2; i++) {
+			userLiquidityData[i].img = null;
+			userLiquidityData[i].title = '';
+			userLiquidityData[i].value = '0';
+		}
+
+		// Reset pool share
+		userLiquidityData[3].value = '0%';
+	};
+
+	const resetOnNewTickerSelected = () => {
+		// Reset the amount of tokens
+		token2Amount = null;
+		token1Amount = null;
+
+		// Reset ratio as old one is no longer valid
+		tokensRatio = null;
+	};
 </script>
 
 <section class="flex flex-col justify-center px-36 pt-32">
@@ -275,11 +367,15 @@
 						bind:selectedTicker={selectedTicker1}
 						bind:tickerToExclude={selectedTicker2}
 						bind:amount={token1Amount}
+						{onSelectTicker}
+						onInput={onToken1Input}
 					/>
 					<TokenInput
 						bind:selectedTicker={selectedTicker2}
 						bind:tickerToExclude={selectedTicker1}
 						bind:amount={token2Amount}
+						{onSelectTicker}
+						onInput={onToken2Input}
 					/>
 				{/if}
 			</div>
@@ -357,7 +453,7 @@
 				</button>
 			{:else}
 				<button
-					class="{approveBtnDynamicClasses} rounded-full border-3 bg-transparent px-10 py-2.5 text-base font-bold capitalize transition-all duration-300"
+					class="{approveBtnDynamicClasses} w-1/3 rounded-full border-3 bg-transparent py-2.5 text-base font-bold capitalize transition-all duration-300"
 					disabled={approveButtonDisabled}
 					onclick={approveSelectedTokens}
 				>
@@ -373,7 +469,3 @@
 		{/if}
 	</div>
 </section>
-
-<!-- TODO: add user liquidity types here and try to make as much type declarations as possible -->
-<!-- TODO: get pool ratio if pair already exsists -->
-<!-- TODO: ... -->

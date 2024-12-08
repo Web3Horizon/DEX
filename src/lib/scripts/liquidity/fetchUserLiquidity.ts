@@ -6,7 +6,6 @@ import { ethers } from 'ethers';
 //**************************************************//
 //** ABI imports **//
 //**************************************************//
-import factoryAbi from '$lib/constants/abi/DexerV2Factory';
 import pairAbi from '$lib/constants/abi/DexerV2Pair';
 import erc20Abi from '$lib/constants/abi/ERC20Approve';
 
@@ -17,51 +16,52 @@ import { AppError, isAppError } from '$lib/types/AppError';
 import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
 import type { TokenInfo } from '$lib/types/tokens/Token';
 import type { PooledTokenDetails, UserLiquidity } from '$lib/constants/userLiquidity';
+import getPairAddress from '$lib/scripts/tokens/getPairAddress';
+import getPairReserves from '$lib/scripts/tokens/getPairReserves';
+import type { PairReserves } from '$lib/types/tokens/PairReserves';
 
-export async function getPairAddress(
-	factoryAddress: string,
-	token1Addr: string,
-	token2Addr: string,
-	provider: ethers.Provider
-): Promise<string> {
-	const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, provider);
-	return await factoryContract.pairs(token1Addr, token2Addr);
-}
-
-export async function fetchUserLiquidity(
+const fetchUserLiquidity = async (
 	factoryAddr: string,
 	token1Info: TokenInfo,
 	token2Info: TokenInfo
-): Promise<UserLiquidity | null> {
+): Promise<UserLiquidity | null> => {
 	try {
-		const provider = getBrowserProvider();
+		const reserves: PairReserves | null = await getPairReserves(
+			token1Info,
+			token2Info,
+			factoryAddr
+		);
 
-		// Fetch pair address
-		const pairAddr = await getPairAddress(
+		if (reserves === null) return null;
+
+		const provider: ethers.BrowserProvider = getBrowserProvider();
+
+		const pairAddr: string = await getPairAddress(
 			factoryAddr,
 			token1Info.address,
 			token2Info.address,
 			provider
 		);
 
-		// Check if the pair exists
-		if (pairAddr === ethers.ZeroAddress) {
-			return null; // If no pair exsists = no pool exists
-		}
+		let signer: ethers.JsonRpcSigner = await provider.getSigner();
+		let userAddr: string = await signer.getAddress();
 
-		let signer = await provider.getSigner();
-		let userAddr = await signer.getAddress();
-
-		const pairContract = new ethers.Contract(pairAddr, pairAbi, provider);
-		const token1Contract = new ethers.Contract(token1Info.address, erc20Abi, provider);
-		const token2Contract = new ethers.Contract(token2Info.address, erc20Abi, provider);
-		//
+		const pairContract: ethers.Contract = new ethers.Contract(pairAddr, pairAbi, provider);
+		const token1Contract: ethers.Contract = new ethers.Contract(
+			token1Info.address,
+			erc20Abi,
+			provider
+		);
+		const token2Contract: ethers.Contract = new ethers.Contract(
+			token2Info.address,
+			erc20Abi,
+			provider
+		);
 
 		// Fetch reserves and total supply
-		const [reserve0, reserve1]: bigint[] = await pairContract.getReserves();
 		const totalSupply: bigint = await pairContract.totalSupply();
 
-		let [token1Decimals, token2Decimals, pairTokenDecimals] = await Promise.all([
+		let [token1Decimals, token2Decimals, pairTokenDecimals]: bigint[] = await Promise.all([
 			token1Contract.decimals(),
 			token2Contract.decimals(),
 			pairContract.decimals()
@@ -71,11 +71,11 @@ export async function fetchUserLiquidity(
 		const poolTokenBalance: bigint = await pairContract.balanceOf(userAddr);
 
 		// Calculate pool share
-		const poolShare = ((poolTokenBalance * 100n) / totalSupply).toString();
+		const poolShare: string = ((poolTokenBalance * 100n) / totalSupply).toString();
 
 		// Calculate pooled amounts
-		const pooledToken1AmountRaw: bigint = (reserve0 * poolTokenBalance) / totalSupply;
-		const pooledToken2AmountRaw: bigint = (reserve1 * poolTokenBalance) / totalSupply;
+		const pooledToken1AmountRaw: bigint = (reserves.reserve1 * poolTokenBalance) / totalSupply;
+		const pooledToken2AmountRaw: bigint = (reserves.reserve2 * poolTokenBalance) / totalSupply;
 
 		// Format pooled token amounts
 		let pooledToken1Amount: string = ethers.formatUnits(pooledToken1AmountRaw, token1Decimals);
@@ -106,4 +106,6 @@ export async function fetchUserLiquidity(
 			);
 		}
 	}
-}
+};
+
+export default fetchUserLiquidity;

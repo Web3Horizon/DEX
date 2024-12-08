@@ -6,6 +6,8 @@
 		selectedTicker: TokenTickers | null;
 		tickerToExclude: TokenTickers | null;
 		amount: number | null;
+		onSelectTicker: (() => Promise<void>) | null;
+		onInput: (() => void) | null;
 	};
 
 	const disabledInputClasses: string = 'cursor-not-allowed';
@@ -14,7 +16,9 @@
 	let {
 		selectedTicker = $bindable(null),
 		tickerToExclude = $bindable(null),
-		amount = $bindable(null)
+		amount = $bindable(null),
+		onSelectTicker = null,
+		onInput = null
 	}: ComponentProps = $props();
 
 	let inputDisabled: boolean = $state(true);
@@ -35,6 +39,7 @@
 			placeholder="0"
 			class="w-full max-w-64 bg-transparent text-4xl outline-none {inputDynamicClasses}"
 			bind:value={amount}
+			oninput={onInput}
 		/>
 		<div class="flex items-center justify-start gap-2">
 			<button class="rounded-full bg-[#6F00FF] px-1 py-2 text-[10px] font-bold uppercase">
@@ -44,7 +49,7 @@
 		</div>
 	</div>
 	<div class="flex items-center">
-		<SelectToken bind:selectedTicker bind:tickerToExclude />
+		<SelectToken bind:selectedTicker bind:tickerToExclude {onSelectTicker} />
 	</div>
 </div>
 
