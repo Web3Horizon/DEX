@@ -21,7 +21,8 @@
 		TokenInput,
 		ConnectWallet,
 		FailModalContent,
-		SuccessModalContent
+		SuccessModalContent,
+		Modal
 	} from '$lib/components';
 
 	//**************************************************//
@@ -36,8 +37,8 @@
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
 	import getPairReserves from '$lib/scripts/tokens/getPairReserves';
-	import { Modal } from '$lib/components';
 	import type { Component } from 'svelte';
+	import getUserBalance from '$lib/scripts/tokens/getUserBalance';
 
 	//**************************************************//
 	//** Local types **//
@@ -58,8 +59,6 @@
 	//**************************************************//
 	//** Local state variables **//
 	//**************************************************//
-	// User has pool token address in MetaMask
-	let hasPoolToken: boolean = $state(false);
 
 	// Modal controller variables
 	let isModalOpen = $state(false);
@@ -93,13 +92,18 @@
 	let token1Info: TokenInfo | null = $state(null);
 	let token2Info: TokenInfo | null = $state(null);
 
+	// User selected token balances
+	let token1Balance: number = $state(0);
+	let token2Balance: number = $state(0);
+
+	// Abort controllers
 	let liquidityLoadingAbortController: AbortController | null = $state(null);
 	let tokenRatioAbortController: AbortController | null = $state(null);
 
 	// User liquidity data for the pair of tokens that he selected
 	let userLiquidityData: PoolField[] = $state([
 		{
-			title: 'Your total pool tokens:',
+			title: 'Your LP token balance:',
 			value: '0',
 			img: null
 		},
@@ -126,16 +130,20 @@
 	const loadTokenRatio = async () => {
 		if (!token1Info || !token2Info) return;
 
+		// Abort any ongoing operation before starting a new one
 		if (tokenRatioAbortController) tokenRatioAbortController.abort();
 
+		// Create a new AbortController instance for this operation
 		tokenRatioAbortController = new AbortController();
 		const { signal } = new AbortController();
 
 		const reserves = await getPairReserves(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR);
 
+		// Do not apply promise results if operation
+		// has been aborted
 		if (signal.aborted) return;
 
-		if (!reserves) {
+		if (!reserves || reserves.reserve1 === 0n || reserves.reserve2 === 0n) {
 			tokensRatio = null;
 			return null;
 		}
@@ -152,7 +160,6 @@
 
 		// Create a new AbortController instance for this operation
 		liquidityLoadingAbortController = new AbortController();
-
 		const { signal } = liquidityLoadingAbortController;
 
 		// Explicitly update user liquidity data (title and image of both tokens) when both tokens are selected
@@ -237,43 +244,80 @@
 	};
 
 	//**************************************************//
-	//** Page functions **//
+	//** Prop functions to components **//
 	//**************************************************//
-	const onToken1Input = () => {
-		if (token1Amount && token1Amount <= 0) token1Amount = 0;
+	const onTokenInput = (inputToken: 'token1' | 'token2') => {
+		if (inputToken === 'token1') {
+			if (token1Amount && token1Amount <= 0) token1Amount = 0;
 
-		if (!tokensRatio) return;
+			if (!tokensRatio) return;
 
-		if (!token1Amount) {
-			token2Amount = null;
-			return;
+			if (!token1Amount) {
+				token2Amount = null;
+				return;
+			}
+
+			token2Amount = token1Amount * tokensRatio;
+		} else if (inputToken === 'token2') {
+			if (token2Amount && token2Amount <= 0) token2Amount = 0;
+
+			if (!tokensRatio) return;
+
+			if (!token2Amount) {
+				token1Amount = null;
+				return;
+			}
+
+			token1Amount = token2Amount / tokensRatio;
 		}
-
-		token2Amount = token1Amount * tokensRatio;
 	};
 
-	const onToken2Input = () => {
-		if (token2Amount && token2Amount <= 0) token2Amount = 0;
-
-		if (!tokensRatio) return;
-
-		if (!token2Amount) {
-			token1Amount = null;
-			return;
-		}
-
-		token1Amount = token2Amount / tokensRatio;
-	};
-
-	const onSelectTicker = async () => {
-		if (!selectedTicker1 || !selectedTicker2 || !$walletConnected) return;
+	const onSelectTicker1 = async () => {
+		if (!selectedTicker1 || !$walletConnected) return;
 
 		token1Info = availableTokens[selectedTicker1];
+
+		resetOnNewTickerSelected();
+
+		let balanceRaw: string | null = await getUserBalance(token1Info);
+
+		if (balanceRaw) {
+			token1Balance = Number(formatNumber(Number(balanceRaw), 5));
+		}
+
+		if (!selectedTicker2) return;
+
+		await Promise.all([loadTokenRatio(), loadUserLiquidity()]);
+	};
+
+	const onSelectTicker2 = async () => {
+		if (!selectedTicker2 || !$walletConnected) return;
+
 		token2Info = availableTokens[selectedTicker2];
 
 		resetOnNewTickerSelected();
 
+		let balanceRaw = await getUserBalance(token2Info);
+
+		if (balanceRaw) {
+			token2Balance = Number(formatNumber(Number(balanceRaw), 5));
+		}
+
+		if (!selectedTicker1) return;
+
 		await Promise.all([loadTokenRatio(), loadUserLiquidity()]);
+	};
+
+	const onClickMaxToken1 = () => {
+		token1Amount = token1Balance;
+
+		onTokenInput('token1');
+	};
+
+	const onClickMaxToken2 = () => {
+		token2Amount = token2Balance;
+
+		onTokenInput('token2');
 	};
 
 	// Effects on approve button when user changes his inputs
@@ -391,15 +435,23 @@
 						bind:selectedTicker={selectedTicker1}
 						bind:tickerToExclude={selectedTicker2}
 						bind:amount={token1Amount}
-						{onSelectTicker}
-						onInput={onToken1Input}
+						onSelectTicker={onSelectTicker1}
+						onInput={() => {
+							onTokenInput('token1');
+						}}
+						balance={token1Balance}
+						onClickMax={onClickMaxToken1}
 					/>
 					<TokenInput
 						bind:selectedTicker={selectedTicker2}
 						bind:tickerToExclude={selectedTicker1}
 						bind:amount={token2Amount}
-						{onSelectTicker}
-						onInput={onToken2Input}
+						onSelectTicker={onSelectTicker2}
+						onInput={() => {
+							onTokenInput('token2');
+						}}
+						balance={token2Balance}
+						onClickMax={onClickMaxToken2}
 					/>
 				{/if}
 			</div>
