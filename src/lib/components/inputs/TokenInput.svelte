@@ -36,7 +36,7 @@
 	};
 
 	$effect(() => {
-		inputDisabled = selectedTicker === null ? true : false;
+		inputDisabled = selectedTicker === null;
 		inputDynamicClasses = inputDisabled ? disabledInputClasses : enabledInputClasses;
 	});
 
@@ -47,7 +47,7 @@
 	});
 </script>
 
-<div class="rounded-4xl border-3 border-app_pink flex w-full justify-between gap-6 px-6 py-4">
+<div class="flex w-full justify-between gap-6 rounded-4xl border-3 border-app_pink px-6 py-4">
 	<div class="flex flex-1 flex-col gap-3">
 		<span class="text-xl font-normal capitalize opacity-50">amount</span>
 		<input

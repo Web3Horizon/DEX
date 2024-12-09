@@ -76,9 +76,7 @@
 	//**************************************************//
 	// Filter out the excluded token from the list
 	$effect(() => {
-		filteredTokens = filteredTokens = availableTokensList.filter(
-			(token) => token !== tickerToExclude
-		);
+		filteredTokens = availableTokensList.filter((token) => token !== tickerToExclude);
 	});
 </script>
 
@@ -140,7 +138,7 @@
 		</div>
 
 		<button
-			class="font-roboto flex items-center justify-center rounded-full bg-[#6F00FF] px-4 py-2 text-base font-bold text-white transition-all duration-300 hover:bg-[#9747FF]"
+			class="flex items-center justify-center rounded-full bg-[#6F00FF] px-4 py-2 font-roboto text-base font-bold text-white transition-all duration-300 hover:bg-[#9747FF]"
 			onclick={toggleModal}
 		>
 			Close
