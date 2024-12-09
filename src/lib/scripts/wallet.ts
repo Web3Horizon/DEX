@@ -1,20 +1,19 @@
 import { ethers } from 'ethers';
 import { walletConnected } from '$lib/stores/wallet';
-import { newAppError, type AppError } from '$lib/types/AppError';
+import { AppError } from '$lib/types/AppError';
+import getBrowserProvider from './helpers/getBrowserProvider';
 
 export async function connectWallet(): Promise<null | AppError> {
-	if (!window.ethereum) {
-		return newAppError('MetaMask is required to connect a wallet', null);
-	}
-
 	try {
-		const provider = new ethers.BrowserProvider(window.ethereum);
+		// This line ensures that 'window.ethereum' exsists and
+		// returns browser provider (MetaMask)
+		const provider: ethers.BrowserProvider = getBrowserProvider();
 
 		// Restore connection from localStorage if exists
 		const previouslyConnectedAddress = localStorage.getItem('connectedWalletAddress');
 		if (previouslyConnectedAddress) {
 			const signer: ethers.JsonRpcSigner = await provider.getSigner();
-			const address: string = signer.address;
+			const address: string = await signer.getAddress();
 
 			if (address === previouslyConnectedAddress) {
 				setupAccountChangeListener();
@@ -24,10 +23,10 @@ export async function connectWallet(): Promise<null | AppError> {
 		}
 
 		// Request account access if not already connected
-		await window.ethereum.request({ method: 'eth_requestAccounts' });
+		await window.ethereum!.request({ method: 'eth_requestAccounts' });
 
 		const signer: ethers.JsonRpcSigner = await provider.getSigner();
-		const address: string = signer.address;
+		const address: string = await signer.getAddress();
 
 		// Save connected wallet address
 		localStorage.setItem('connectedWalletAddress', address);
@@ -42,7 +41,8 @@ export async function connectWallet(): Promise<null | AppError> {
 
 		return null;
 	} catch (err: any) {
-		return newAppError('Error connecting wallet', err.toString());
+		console.error(err);
+		return new AppError('Error connecting wallet', err.toString());
 	}
 }
 
@@ -54,7 +54,7 @@ export function disconnectWallet(): void {
 // Listen for account changes
 function setupAccountChangeListener(): null | AppError {
 	if (!window.ethereum) {
-		return newAppError('MetaMask is required to setup an account listener', null);
+		return new AppError('MetaMask is required to setup an account listener', null);
 	}
 
 	window.ethereum.on('accountsChanged', (accounts: string[] | unknown) => {

@@ -1,10 +1,9 @@
 import type { TokenInfo } from '$lib/types/tokens/Token';
 
 export enum TokenTickers {
-	UNI = 'UNI',
-	COIN1 = 'COIN1',
-	COIN2 = 'COIN2',
-	COIN3 = 'COIN3',
-	COIN4 = 'COIN4'
+	TOKENA = 'TOKENA',
+	TOKENB = 'TOKENB',
+	TOKENC = 'TOKENC',
+	TOKEND = 'TOKEND'
 }
 export type AvailableTokens = Record<TokenTickers, TokenInfo>;

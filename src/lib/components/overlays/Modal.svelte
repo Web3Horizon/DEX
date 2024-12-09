@@ -21,13 +21,11 @@
 		dialog?.addEventListener('click', function (event) {
 			if (!dialog) return;
 			var rect = dialog.getBoundingClientRect();
-
 			var isInDialog =
 				rect.top <= event.clientY &&
 				event.clientY <= rect.top + rect.height &&
 				rect.left <= event.clientX &&
 				event.clientX <= rect.left + rect.width;
-
 			if (!isInDialog) {
 				isOpen = false;
 			}
@@ -36,7 +34,7 @@
 </script>
 
 <dialog class="custom-backdrop bg-transparent outline-none" bind:this={dialog}>
-	<div class="bg-deep_dark_purple flex flex-col rounded-3xl p-4">
+	<div class="flex flex-col rounded-3xl bg-deep_dark_purple p-4">
 		<div class="flex justify-end">
 			<button aria-label="close" class="flex" onclick={close}>
 				<Icon

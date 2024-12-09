@@ -12,11 +12,11 @@
 			poolTokenAmount: '1.1',
 			poolShare: '100',
 			coin1: {
-				ticker: TokenTickers.UNI,
+				ticker: TokenTickers.TOKENA,
 				pooledAmount: '4.98233'
 			},
 			coin2: {
-				ticker: TokenTickers.COIN1,
+				ticker: TokenTickers.TOKENB,
 				pooledAmount: '3'
 			}
 		},
@@ -24,11 +24,11 @@
 			poolTokenAmount: '1.1444',
 			poolShare: '1.7',
 			coin1: {
-				ticker: TokenTickers.UNI,
+				ticker: TokenTickers.TOKENA,
 				pooledAmount: '4.33'
 			},
 			coin2: {
-				ticker: TokenTickers.COIN2,
+				ticker: TokenTickers.TOKENB,
 				pooledAmount: '390'
 			}
 		}

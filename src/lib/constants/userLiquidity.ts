@@ -3,11 +3,11 @@ import type { AvailableTokens } from '$lib/types/tokens/AvailableTokens';
 export type UserLiquidity = {
 	poolTokenAmount: string;
 	poolShare: string;
-	coin1: CoinPooledDetails;
-	coin2: CoinPooledDetails;
+	token1: PooledTokenDetails;
+	token2: PooledTokenDetails;
 };
 
-type CoinPooledDetails = {
+export type PooledTokenDetails = {
 	ticker: keyof AvailableTokens;
 	pooledAmount: string;
 };

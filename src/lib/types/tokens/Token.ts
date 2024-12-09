@@ -4,4 +4,5 @@ export type TokenInfo = {
 	ticker: TokenTickers;
 	address: string;
 	imgPath: string;
+	decimals: number;
 };
