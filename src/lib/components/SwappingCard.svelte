@@ -1,27 +1,20 @@
 <script lang="ts">
-	import { SelectToken } from '$lib/components';
+	import { TokenInput } from '$lib/components';
+	import { walletConnected } from '$lib/stores/wallet';
+	import GetStart from './buttons/GetStart.svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import Mascot from './mascot/Mascot.svelte';
+	import type { TokenTickers } from '$lib/types/tokens/AvailableTokens'; // Import TokenTickers type
 	import { Swapicon } from '$lib/assets/icons';
 
-	type Token = {
-		name: string;
-		icon: string;
-	};
-	// for show the price to the user
-	type Price = {
-		id: number;
-	};
-
-	// Token states
-	let selectedTopToken: Token | null = null;
-	let selectedBottomToken: Token | null = null;
-	// let totalPool:
-	// let poolShare:
-	const taglines = [
+	let showSecondText: boolean = $state(false);
+	let Taglines: string[] = [
 		'S',
 		'w',
 		'a',
 		'p',
-		' ',
+		'\u00A0',
+		'<br>',
 		'a',
 		'n',
 		'y',
@@ -31,7 +24,8 @@
 		'r',
 		'e',
 		',',
-		' ',
+		'\u00A0',
+		'<br>',
 		'a',
 		'n',
 		'y',
@@ -41,103 +35,136 @@
 		'e',
 		'.'
 	];
+
+	let secondText: string[] = [
+		'E',
+		'a',
+		's',
+		'i',
+		'l',
+		'y',
+		'\u00A0',
+		't',
+		'o',
+		'g',
+		'g',
+		'l',
+		'e',
+		'\u00A0',
+		't',
+		'o',
+		'\u00A0',
+		'<br>',
+		'e',
+		'x',
+		'c',
+		'h',
+		'a',
+		'n',
+		'g',
+		'e',
+		'\u00A0',
+		'c',
+		'r',
+		'y',
+		'p',
+		't',
+		'o',
+		'\u00A0',
+		'<br>',
+		'i',
+		'n',
+		'\u00A0',
+		'r',
+		'e',
+		'a',
+		'l',
+		'\u00A0',
+		't',
+		'i',
+		'm',
+		'e',
+		'.'
+	];
+
+	let intervalId: NodeJS.Timeout;
+	let token1Amount: number | null = $state(null);
+	let token2Amount: number | null = $state(null);
+
+	// Props for TokenInput component
+	let selectedTicker: TokenTickers | null = null;
+	let tickerToExclude: TokenTickers | null = null;
+	let amount: number | null = null;
+
+	// Toggle the flag every 5 seconds
+	function startTextLoop() {
+		intervalId = setInterval(() => {
+			showSecondText = !showSecondText;
+		}, 5000);
+	}
+
+	// Start the loop when the component is mounted
+	onMount(() => {
+		startTextLoop();
+	});
+
+	// Clean up the interval when the component is destroyed
+	onDestroy(() => {
+		clearInterval(intervalId);
+	});
 </script>
 
-<div class=" flex flex-col pb-32 pl-32 pt-32">
-	<div class="  flex w-[490px]">
-		<h1
-			class="col-span-2 text-balance text-center font-roboto text-[45px] font-bold text-[#ffffff]"
-		>
-			{#each taglines as letter, index}
-				<span class="fade-in inline-block" style="animation-delay: {index * 0.075}s">
-					{letter === ' ' ? '\u00A0' : letter}
-				</span>
-				{#if letter === ','}
-					<br />
+<section class="flex h-screen flex-row space-x-80 pl-16 pt-48">
+	<div class="font-roboto flex w-[500px] flex-col gap-5 text-white">
+		{#if !$walletConnected}
+			<!-- Show taglines while wallet is not connected -->
+			<h1 class="font-roboto text-nowrap text-6xl font-bold uppercase">
+				{#if !showSecondText}
+					{#each Taglines as letter, index}
+						{#if letter === '<br>'}
+							<br />
+						{:else}
+							<span class="fade-in inline-block" style="animation-delay: {index * 0.075}s">
+								{letter}
+							</span>
+						{/if}
+					{/each}
+				{:else}
+					{#each secondText as letter, index}
+						{#if letter === '<br>'}
+							<br />
+						{:else}
+							<span class="fade-in inline-block" style="animation-delay: {index * 0.075}s">
+								{letter}
+							</span>
+						{/if}
+					{/each}
 				{/if}
-			{/each}
-		</h1>
-	</div>
-
-	<!-- Main Card Container -->
-	<div
-		class="grid h-[516] w-full max-w-[490px] grid-cols-3 gap-3 rounded-[50px] bg-[#5800CA]/30 px-8 py-8 text-white backdrop-blur-[4px]"
-	>
-		<!-- icon swapping -->
-		<div class=" absolute left-[225px] top-44">
-			<Swapicon class="theme-color-cycle h-11 w-full" />
-		</div>
-
-		<!-- Amount Card1 (Top) -->
-		<div
-			class="col-span-1 flex h-[160px] max-w-[474px] flex-col items-center space-y-2 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
-		>
-			<!-- Amount Label -->
-			<label for="amount" class="self-start font-roboto text-[16px] font-medium text-gray-400">
-				Amount
-			</label>
-
-			<!-- Input Row with SelectToken -->
-			<div class="flex w-full items-center space-x-4">
-				<!-- Amount Input -->
-				<input
-					id="amounttop"
-					type="number"
-					placeholder="0"
-					class="w-3 flex-grow bg-transparent font-roboto text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
-				/>
-
-				<!-- Select Token Component -->
-				<!-- <SelectToken bind:selectedTicker={selectedTopToken} tickerToExclude={selectedBottomToken} /> -->
+			</h1>
+			<p class=" font-roboto pt-5 text-lg text-gray-300">Connect your wallet to start swapping.</p>
+			<div>
+				<GetStart />
 			</div>
-
-			<!-- Max and Balance Section -->
-			<div class="flex w-full items-center space-x-4">
-				<div class="font-roboto text-[16px] text-white">$0</div>
-			</div>
-		</div>
-		<!-- Amount Card2 (Bottom) -->
-		<div
-			class="col-span-1 flex h-[160px] max-w-[474px] flex-col items-center space-y-2 rounded-[50px] border-[3px] border-[#E018FF] bg-[#3A176D] px-6 py-4 lg:col-span-4"
-		>
-			<!-- Amount Label -->
-			<label for="amount" class="self-start font-roboto text-[16px] font-medium text-gray-400">
-				Amount
-			</label>
-
-			<!-- Input Row with SelectToken -->
-			<div class="flex w-full items-center space-x-4">
-				<!-- Amount Input -->
-				<input
-					id="amountbotton"
-					type="number"
-					placeholder="0"
-					class="w-3 flex-grow bg-transparent font-roboto text-2xl text-white placeholder-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
-				/>
-				<!-- Select Token Component (Bottom) -->
-				<!-- <SelectToken bind:selectedToken={selectedBottomToken} excludeToken={selectedTopToken} /> -->
-			</div>
-
-			<!-- Max and Balance Section -->
-			<div class="flex w-full items-center space-x-4">
-				<!-- Balance Text -->
-				<div class="font-roboto text-[16px] text-white">$0</div>
-			</div>
-		</div>
-
-		<!-- Get Started Button -->
-		<div class="col-span-1 mt-6 flex justify-center lg:col-span-4">
-			<button
-				class="flex items-center gap-2.5 rounded-full border border-solid border-fuchsia-600 px-10 py-2.5 font-roboto text-[20px] font-bold transition-all duration-200 hover:bg-[#E018FF] hover:shadow-app-button hover:shadow-app_pink"
+		{:else}
+			<!-- Once wallet is connected, remove taglines and show input fields -->
+			<div
+				class="rounded-4xl border-app_pink flex flex-col items-center justify-center space-y-5 border bg-[#5800CA] bg-opacity-20 px-4 py-4 backdrop-blur-lg"
 			>
-				Get Started
-			</button>
-		</div>
+				<div class=" absolute pb-12">
+					<Swapicon class=" theme-color-cycle"></Swapicon>
+				</div>
+				<!-- Token Inputs -->
+				<TokenInput {selectedTicker} {tickerToExclude} {amount} />
 
-		<!-- Disclaimer -->
-		<div class="col-span-1 text-center font-roboto text-sm text-gray-400 lg:col-span-4">
-			Cryptocurrencies are highly risky and volatile. The value of your holding could fall to zero.
-			Consider your financial circumstances and risk appetite.
-		</div>
+				<TokenInput {selectedTicker} {tickerToExclude} {amount} />
+
+				<!-- GetStart Button, add fixed width or max width -->
+
+				<GetStart />
+			</div>
+		{/if}
 	</div>
-</div>
+	<div class="flex justify-end">
+		<Mascot />
+	</div>
+</section>

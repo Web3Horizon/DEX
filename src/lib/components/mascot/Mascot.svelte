@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import mascotImage from '$lib/assets/img/mascotImage.png'; 
-	import leftEyeImage from '$lib/assets/img/left-eye.png'; 
-	import rightEyeImage from '$lib/assets/img/right-eye.png'; 
+	import mascotImage from '$lib/assets/img/mascotImage.png';
+	import eyes from '$lib/assets/img/eyes.png';
 
 	let monsterImage: HTMLDivElement;
 	let eyeLeft: HTMLImageElement;
@@ -10,8 +9,8 @@
 	let monsterRect: DOMRect | undefined;
 
 	const eyeLeftPosition = { x: 222, y: 122 };
-	const eyeRightPosition = { x: 128, y: 122 }; 
-	const eyeRadius = 14; 
+	const eyeRightPosition = { x: 128, y: 122 };
+	const eyeRadius = 14;
 
 	function handleMouseMove(event: MouseEvent) {
 		if (!monsterRect) return;
@@ -27,7 +26,7 @@
 			const distance = Math.sqrt(dx * dx + dy * dy);
 			const angle = Math.atan2(dy, dx);
 
-			const limitedDistance = Math.min(distance, eyeRadius); 
+			const limitedDistance = Math.min(distance, eyeRadius);
 			return {
 				x: Math.cos(angle) * limitedDistance,
 				y: Math.sin(angle) * limitedDistance
@@ -61,28 +60,26 @@
 	});
 </script>
 
-<div class="absolute right-[250px] top-[350px]">
-	<div class="relative h-[350px] w-[350px]" bind:this={monsterImage}>
-		<img src={mascotImage} alt="Monster" class="h-full w-full" />
+<div class="relative h-[350px] w-[350px]" bind:this={monsterImage}>
+	<img src={mascotImage} alt="Monster" class="h-full w-full" />
 
-		<!-- Left Eye -->
-		<img
-			src={leftEyeImage}
-			alt="Left Eye"
-			class="absolute"
-			bind:this={eyeLeft}
-			style="height: 2rem; width: 2rem; transform: translate(-50%, -50%) translate(222px, 122px);"
-		/>
+	<!-- Left Eye -->
+	<img
+		src={eyes}
+		alt="Left Eye"
+		class="absolute"
+		bind:this={eyeLeft}
+		style="height: 2rem; width: 2rem; transform: translate(-50%, -50%) translate(222px, 122px);"
+	/>
 
-		<!-- Right Eye -->
-		<img
-			src={rightEyeImage}
-			alt="Right Eye"
-			class="absolute"
-			bind:this={eyeRight}
-			style="height: 2rem; width: 2rem; transform: translate(-50%, -50%) translate(128px, 122px);"
-		/>
-	</div>
+	<!-- Right Eye -->
+	<img
+		src={eyes}
+		alt="Right Eye"
+		class="absolute"
+		bind:this={eyeRight}
+		style="height: 2rem; width: 2rem; transform: translate(-50%, -50%) translate(128px, 122px);"
+	/>
 </div>
 
 <style>

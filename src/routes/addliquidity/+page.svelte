@@ -81,7 +81,7 @@
 	<!-- Main box -->
 	<!-------------------------------------------------->
 	<div
-		class="flex flex-col items-center gap-16 rounded-4xl border border-app_pink bg-gradient-to-t from-[#2C0768] to-[#1A053B] px-16 pb-12 pt-8 font-roboto text-white"
+		class="rounded-4xl border-app_pink font-roboto flex flex-col items-center gap-16 border bg-gradient-to-t from-[#2C0768] to-[#1A053B] px-16 pb-12 pt-8 text-white"
 	>
 		<div class="grid w-full grid-cols-2 gap-x-32">
 			<!-------------------------------------------------->
@@ -93,6 +93,14 @@
 				<!-- Heading -->
 				<!-------------------------------------------------->
 				<h1 class="text-4xl font-bold capitalize">add liquidity</h1>
+				<!-------------------------------------------------->
+				<!-- text -->
+				<!-------------------------------------------------->
+				{#if !$walletConnected}
+					<p class="font-roboto whitespace-nowrap text-center text-lg text-gray-300">
+						Please connect your wallet to start adding liquidity.
+					</p>
+				{/if}
 
 				<!-------------------------------------------------->
 				<!-- Inputs for 2 tokens -->
@@ -126,7 +134,7 @@
 							<div class="text-3xl font-bold">{token2Info.ticker}</div>
 						</div>
 					</div>
-					<div class="flex flex-col gap-2.5 rounded-3xl border border-app_pink px-3 py-8 text-base">
+					<div class="border-app_pink flex flex-col gap-2.5 rounded-3xl border px-3 py-8 text-base">
 						{#each userPoolData as poolField}
 							<div class="flex justify-between">
 								<p>{poolField.title}</p>
@@ -154,7 +162,7 @@
 		<!-------------------------------------------------->
 		{#if $walletConnected}
 			<button
-				class="rounded-full border-3 border-app_pink bg-transparent px-10 py-2.5 text-base font-bold capitalize transition-all duration-300 hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink"
+				class="border-3 border-app_pink hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink rounded-full bg-transparent px-10 py-2.5 text-base font-bold capitalize transition-all duration-300"
 			>
 				approve
 			</button>
