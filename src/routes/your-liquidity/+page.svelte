@@ -36,7 +36,15 @@
 </script>
 
 <section class="relative flex flex-col gap-5 px-64 pt-64">
-	<h1 class="z-10 font-roboto text-4xl font-bold capitalize text-white">your liquidity</h1>
+	<h1 class="font-roboto z-10 text-4xl font-bold capitalize text-white">your liquidity</h1>
+	<!-------------------------------------------------->
+	<!-- text -->
+	<!-------------------------------------------------->
+	{#if !$walletConnected}
+		<p class="font-roboto flex whitespace-nowrap text-center text-lg text-gray-300">
+			Please connect your wallet to start adding liquidity.
+		</p>
+	{/if}
 	{#if $walletConnected}
 		<img
 			src={LiquidityMonsterImage}

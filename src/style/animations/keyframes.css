@@ -29,3 +29,14 @@
 		background-position: 100% 50%;
 	}
 }
+@keyframes moving-light {
+    0% {
+      box-shadow: 0 0 10px 2px #e018ff, 0 0 30px 4px #e018ff;
+    }
+    50% {
+      box-shadow: 0 0 20px 4px #e018ff, 0 0 40px 8px #e018ff;
+    }
+    100% {
+      box-shadow: 0 0 10px 2px #e018ff, 0 0 30px 4px #e018ff;
+    }
+  }

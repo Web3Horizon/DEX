@@ -426,6 +426,14 @@
 				<!-- Heading -->
 				<!-------------------------------------------------->
 				<h1 class="text-4xl font-bold capitalize">add liquidity</h1>
+				<!-------------------------------------------------->
+				<!-- text -->
+				<!-------------------------------------------------->
+				{#if !$walletConnected}
+					<p class="whitespace-nowrap text-center font-roboto text-lg text-gray-300">
+						Please connect your wallet to start adding liquidity.
+					</p>
+				{/if}
 
 				<!-------------------------------------------------->
 				<!-- Inputs for 2 tokens -->

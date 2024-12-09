@@ -4,7 +4,7 @@
 </script>
 
 <div
-	class="fixed inset-0 z-[-1] h-screen w-screen overflow-hidden bg-gradient-to-r from-[#1E0447] via-[#13022f] to-[#1E0447]"
+	class="fixed inset-0 z-[-1] h-screen w-screen overflow-hidden bg-gradient-to-r from-[#1E0447] via-[#090017] to-[#1E0447]"
 >
 	<!-- Top-left circle -->
 	<div
