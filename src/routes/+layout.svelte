@@ -7,10 +7,12 @@
 	let { children } = $props();
 </script>
 
-<Header></Header>
-<Background></Background>
+<div class="min-h-screen">
+	<Header></Header>
+	<Background></Background>
 
-<!-- Render all the children, i.e. nested routes -->
-{@render children()}
+	<!-- Render all the children, i.e. nested routes -->
+	{@render children()}
+</div>
 
 <Footer></Footer>

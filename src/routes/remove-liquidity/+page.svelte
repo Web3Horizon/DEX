@@ -3,9 +3,9 @@
 	//** Imports from library **//
 	//**************************************************//
 	import type { UserLiquidity } from '$lib/constants/userLiquidity';
-	import { coinImagePaths, type CoinImagePaths } from '$lib/constants/coinImagePaths';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { availableTokens } from '$lib/constants/availableTokens';
 
 	// Data that will be loaded when passed to the
 	// page in state
@@ -24,16 +24,14 @@
 	$effect(() => {
 		if (removeAmount && removeAmount <= 0) removeAmount = 0;
 	});
+	let token1ExpectedToBeReturned = 0;
+	let token2ExpectedToBeReturned = 0;
 
 	//**************************************************//
 	//** Local constants **//
 	//**************************************************//
-	const ticker1Image = data?.coin1?.ticker
-		? coinImagePaths[data.coin1.ticker as keyof CoinImagePaths]
-		: null;
-	const ticker2Image = data?.coin2?.ticker
-		? coinImagePaths[data.coin2.ticker as keyof CoinImagePaths]
-		: null;
+	const ticker1Image = data?.coin1?.ticker ? availableTokens[data.coin1.ticker].imgPath : null;
+	const ticker2Image = data?.coin2?.ticker ? availableTokens[data.coin2.ticker].imgPath : null;
 
 	const removeAmountQuickButtons = [
 		{
@@ -49,17 +47,16 @@
 			title: 'Max'
 		}
 	];
-
 	const userCoinsToBeReturned = data
 		? [
 				{
 					ticker: data.coin1.ticker,
-					amount: '0',
+					amount: token1ExpectedToBeReturned,
 					image: ticker1Image
 				},
 				{
 					ticker: data.coin2.ticker,
-					amount: '0',
+					amount: token2ExpectedToBeReturned,
 					image: ticker2Image
 				}
 			]
@@ -89,13 +86,14 @@
 
 <section class="flex justify-center pt-36 font-roboto text-white">
 	<div
-		class="rounded-4xl flex flex-col items-center gap-14 border border-app_pink bg-gradient-to-t from-[#5100BA] to-[#1A053B] px-9 py-8"
+		class="flex flex-col items-center gap-14 rounded-4xl border border-app_pink bg-gradient-to-t from-[#5100BA] to-[#1A053B] px-9 py-8"
 	>
 		<div class="flex flex-col items-center gap-8">
 			<!-------------------------------------------------->
 			<!-- Page Heading -->
 			<!-------------------------------------------------->
 			<h2 class=" text-3xl font-bold capitalize">remove liquidity</h2>
+			
 			<!-------------------------------------------------->
 			<!-- Remove amount controller box -->
 			<!-------------------------------------------------->
@@ -127,13 +125,13 @@
 					</div>
 				</div>
 				<!-------------------------------------------------->
-				<!-- User pooled coins -->
+				<!-- Expected amount af tokens to be returned -->
 				<!-------------------------------------------------->
 				<div class="flex flex-col gap-6 font-light">
 					{#each userCoinsToBeReturned as coin}
 						<div class="flex justify-between">
 							<div class="flex items-center gap-1">
-								<img src={ticker1Image} alt="" class="h-6" />
+								<img src={coin.image} alt="" class="h-6" />
 								<span class="text-xl">{coin.ticker}</span>
 							</div>
 							<span class="text-2xl">{coin.amount}</span>
