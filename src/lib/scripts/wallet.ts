@@ -41,7 +41,7 @@ export async function connectWallet(): Promise<null | AppError> {
 
 		return null;
 	} catch (err: any) {
-		console.log(err);
+		console.error(err);
 		return new AppError('Error connecting wallet', err.toString());
 	}
 }

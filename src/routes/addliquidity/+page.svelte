@@ -17,8 +17,12 @@
 	//**************************************************//
 	//** Components imports **//
 	//**************************************************//
-	import { TokenInput } from '$lib/components';
-	import ConnectWallet from '$lib/components/buttons/ConnectWallet.svelte';
+	import {
+		TokenInput,
+		ConnectWallet,
+		FailModalContent,
+		SuccessModalContent
+	} from '$lib/components';
 
 	//**************************************************//
 	//** Other imports from library **//
@@ -32,6 +36,8 @@
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
 	import getPairReserves from '$lib/scripts/tokens/getPairReserves';
+	import { Modal } from '$lib/components';
+	import type { Component } from 'svelte';
 
 	//**************************************************//
 	//** Local types **//
@@ -52,6 +58,14 @@
 	//**************************************************//
 	//** Local state variables **//
 	//**************************************************//
+	// User has pool token address in MetaMask
+	let hasPoolToken: boolean = $state(false);
+
+	// Modal controller variables
+	let isModalOpen = $state(false);
+	let ModalComponent: Component | null = $state(null);
+
+	// State of loading user liquidity
 	let isLoadingLiquidity: boolean = $state(false);
 
 	// Approve button variables
@@ -210,12 +224,12 @@
 		try {
 			await addLiquidity(token1Amount, token1Info, token2Amount, token2Info);
 
-			// TODO: show modal that everything went well
+			showSuccessModal();
 
 			// Reset everything in case of success
 			resetOnConfirmed();
 		} catch (error) {
-			// TODO: show fail modal
+			showFailModal();
 			console.error('An error occurred:', error);
 		} finally {
 			isConfirming = false;
@@ -252,7 +266,7 @@
 	};
 
 	const onSelectTicker = async () => {
-		if (!selectedTicker1 || !selectedTicker2 || !walletConnected) return;
+		if (!selectedTicker1 || !selectedTicker2 || !$walletConnected) return;
 
 		token1Info = availableTokens[selectedTicker1];
 		token2Info = availableTokens[selectedTicker2];
@@ -333,6 +347,16 @@
 		// Reset ratio as old one is no longer valid
 		tokensRatio = null;
 	};
+
+	const showSuccessModal = () => {
+		ModalComponent = SuccessModalContent;
+		isModalOpen = true;
+	};
+
+	const showFailModal = () => {
+		ModalComponent = FailModalContent;
+		isModalOpen = true;
+	};
 </script>
 
 <section class="flex flex-col justify-center px-36 pt-32">
@@ -405,7 +429,7 @@
 					<div class="flex flex-col gap-2.5 rounded-3xl border border-app_pink px-3 py-8 text-base">
 						{#each userLiquidityData as poolField}
 							<div class="flex justify-between">
-								<p>{poolField.title}</p>
+								<p class="text-nowrap">{poolField.title}</p>
 								{#if isLoadingLiquidity}
 									<Icon
 										icon="line-md:loading-twotone-loop"
@@ -469,3 +493,9 @@
 		{/if}
 	</div>
 </section>
+
+<Modal bind:isOpen={isModalOpen}>
+	{#if ModalComponent}
+		<ModalComponent />
+	{/if}
+</Modal>

@@ -20,7 +20,6 @@ export async function approveTokens(
 
 		const allowance = await tokenContract.allowance(signer.address, routerAddress);
 
-		console.log(allowance, amountInBlockchainFormat);
 		// Check if allowance is already sufficient
 		if (allowance >= amountInBlockchainFormat) return null;
 
@@ -28,7 +27,6 @@ export async function approveTokens(
 			gasLimit: 1000000
 		});
 		await tx.wait();
-		console.log(`Approval successful for ${tokenInfo.address}`);
 
 		return null;
 	} catch (e: any) {

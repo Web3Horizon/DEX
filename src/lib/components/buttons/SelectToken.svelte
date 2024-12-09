@@ -35,14 +35,14 @@
 	let isModalOpen: boolean = $state(false);
 
 	// List of available tokens, converted from Map 'availableTokens'
-	let availableTokensList: string[] = Object.keys(TokenTickers);
+	let availableTokensList: TokenTickers[] = Object.keys(TokenTickers) as TokenTickers[];
 
 	// Search input value
 	let searchQuery: string = $state('');
 
 	// Initialize filtered tokens with the full list
 	// later in the code will be modified by user input
-	let filteredTokens: string[] = $state(availableTokensList);
+	let filteredTokens: TokenTickers[] = $state(availableTokensList);
 
 	//**************************************************//
 	//** Component functions **//
@@ -53,7 +53,7 @@
 
 	// Filter tokens based on the search query and exclude selected token
 	const searchTokens = () => {
-		filteredTokens = availableTokensList.filter((token: string) =>
+		filteredTokens = availableTokensList.filter((token: TokenTickers) =>
 			token.includes(searchQuery.toUpperCase())
 		);
 	};
@@ -61,6 +61,8 @@
 	// Handle token selection and close modal
 	const selectToken = async (ticker: TokenTickers) => {
 		selectedTicker = ticker;
+		selectedTokenInfo = availableTokens[ticker];
+
 		isModalOpen = false;
 
 		await tick();
@@ -74,13 +76,9 @@
 	//**************************************************//
 	// Filter out the excluded token from the list
 	$effect(() => {
-		filteredTokens = tickerToExclude
-			? availableTokensList.filter((token: string) => token !== tickerToExclude)
-			: availableTokensList;
-	});
-
-	$effect(() => {
-		if (selectedTicker) selectedTokenInfo = availableTokens[selectedTicker];
+		filteredTokens = filteredTokens = availableTokensList.filter(
+			(token) => token !== tickerToExclude
+		);
 	});
 </script>
 
