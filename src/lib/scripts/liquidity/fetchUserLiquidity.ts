@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 //** ABI imports **//
 //**************************************************//
 import pairAbi from '$lib/constants/abi/DexerV2Pair';
-import erc20Abi from '$lib/constants/abi/ERC20Approve';
+import erc20Abi from '$lib/constants/abi/ERC20';
 
 //**************************************************//
 //** Other library imports **//
@@ -21,15 +21,17 @@ import getPairReserves from '$lib/scripts/tokens/getPairReserves';
 import type { PairReserves } from '$lib/types/tokens/PairReserves';
 
 const fetchUserLiquidity = async (
-	factoryAddr: string,
 	token1Info: TokenInfo,
-	token2Info: TokenInfo
+	token2Info: TokenInfo,
+	factoryAddr: string,
+	routerAddr: string
 ): Promise<UserLiquidity | null> => {
 	try {
 		const reserves: PairReserves | null = await getPairReserves(
 			token1Info,
 			token2Info,
-			factoryAddr
+			factoryAddr,
+			routerAddr
 		);
 
 		if (reserves === null) return null;

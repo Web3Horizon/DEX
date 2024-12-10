@@ -11,11 +11,11 @@
 		{
 			poolTokenAmount: '1.1',
 			poolShare: '100',
-			coin1: {
+			token1: {
 				ticker: TokenTickers.TOKENA,
 				pooledAmount: '4.98233'
 			},
-			coin2: {
+			token2: {
 				ticker: TokenTickers.TOKENB,
 				pooledAmount: '3'
 			}
@@ -23,11 +23,11 @@
 		{
 			poolTokenAmount: '1.1444',
 			poolShare: '1.7',
-			coin1: {
+			token1: {
 				ticker: TokenTickers.TOKENA,
 				pooledAmount: '4.33'
 			},
-			coin2: {
+			token2: {
 				ticker: TokenTickers.TOKENB,
 				pooledAmount: '390'
 			}
@@ -36,12 +36,12 @@
 </script>
 
 <section class="relative flex flex-col gap-5 px-64 pt-64">
-	<h1 class="font-roboto z-10 text-4xl font-bold capitalize text-white">your liquidity</h1>
+	<h1 class="z-10 font-roboto text-4xl font-bold capitalize text-white">your liquidity</h1>
 	<!-------------------------------------------------->
 	<!-- text -->
 	<!-------------------------------------------------->
 	{#if !$walletConnected}
-		<p class="font-roboto flex whitespace-nowrap text-center text-lg text-gray-300">
+		<p class="flex whitespace-nowrap text-center font-roboto text-lg text-gray-300">
 			Please connect your wallet to start adding liquidity.
 		</p>
 	{/if}

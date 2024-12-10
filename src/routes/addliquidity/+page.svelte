@@ -36,9 +36,10 @@
 	import { walletConnected } from '$lib/stores/wallet';
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
-	import getPairReserves from '$lib/scripts/tokens/getPairReserves';
 	import type { Component } from 'svelte';
 	import getUserBalance from '$lib/scripts/tokens/getUserBalance';
+	import loadTokenRatio from '$lib/scripts/tokens/loadTokenRatio';
+	import formatNumber from '$lib/scripts/helpers/formatNumber';
 
 	//**************************************************//
 	//** Local types **//
@@ -127,31 +128,6 @@
 	//**************************************************//
 	//** Page functions **//
 	//**************************************************//
-	const loadTokenRatio = async () => {
-		if (!token1Info || !token2Info) return;
-
-		// Abort any ongoing operation before starting a new one
-		if (tokenRatioAbortController) tokenRatioAbortController.abort();
-
-		// Create a new AbortController instance for this operation
-		tokenRatioAbortController = new AbortController();
-		const { signal } = new AbortController();
-
-		const reserves = await getPairReserves(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR);
-
-		// Do not apply promise results if operation
-		// has been aborted
-		if (signal.aborted) return;
-
-		if (!reserves || reserves.reserve1 === 0n || reserves.reserve2 === 0n) {
-			tokensRatio = null;
-			return null;
-		}
-
-		tokensRatio = Number(reserves.reserve1) / Number(reserves.reserve2);
-		return tokensRatio;
-	};
-
 	const loadUserLiquidity = async () => {
 		if (!$walletConnected || !token1Info || !token2Info) return;
 
@@ -172,9 +148,10 @@
 
 		try {
 			let result: UserLiquidity | null = await fetchUserLiquidity(
-				PUBLIC_DEXER_V2_FACTORY_ADDR,
 				token1Info,
-				token2Info
+				token2Info,
+				PUBLIC_DEXER_V2_FACTORY_ADDR,
+				PUBLIC_DEXER_V2_ROUTER_ADDR
 			);
 
 			// Check if the signal was aborted after the operation
@@ -257,7 +234,7 @@
 				return;
 			}
 
-			token2Amount = token1Amount * tokensRatio;
+			token2Amount = token1Amount / tokensRatio;
 		} else if (inputToken === 'token2') {
 			if (token2Amount && token2Amount <= 0) token2Amount = 0;
 
@@ -268,7 +245,7 @@
 				return;
 			}
 
-			token1Amount = token2Amount / tokensRatio;
+			token1Amount = token2Amount * tokensRatio;
 		}
 	};
 
@@ -285,9 +262,7 @@
 			token1Balance = Number(formatNumber(Number(balanceRaw), 5));
 		}
 
-		if (!selectedTicker2) return;
-
-		await Promise.all([loadTokenRatio(), loadUserLiquidity()]);
+		await loadRatioAndLiquidity();
 	};
 
 	const onSelectTicker2 = async () => {
@@ -303,9 +278,7 @@
 			token2Balance = Number(formatNumber(Number(balanceRaw), 5));
 		}
 
-		if (!selectedTicker1) return;
-
-		await Promise.all([loadTokenRatio(), loadUserLiquidity()]);
+		await loadRatioAndLiquidity();
 	};
 
 	const onClickMaxToken1 = () => {
@@ -320,6 +293,9 @@
 		onTokenInput('token2');
 	};
 
+	//**************************************************//
+	//** Page effects **//
+	//**************************************************//
 	// Effects on approve button when user changes his inputs
 	$effect(() => {
 		approveButtonDisabled =
@@ -338,16 +314,28 @@
 	//**************************************************//
 	//** Helper functions **//
 	//**************************************************//
-	function formatNumber(value: number, maxDecimals: number) {
-		const valueString = value.toString();
-		if (valueString.includes('.')) {
-			const [integerPart, decimalPart] = valueString.split('.');
-			if (decimalPart.length > maxDecimals) {
-				return `${integerPart}.${decimalPart.slice(0, maxDecimals)}`;
-			}
-		}
-		return valueString;
-	}
+	const loadRatioAndLiquidity = async () => {
+		if (!token1Info || !token2Info) return;
+
+		if (tokenRatioAbortController) tokenRatioAbortController.abort();
+
+		tokenRatioAbortController = new AbortController();
+		const { signal } = tokenRatioAbortController;
+
+		let [loadedTokenRatio] = await Promise.all([
+			loadTokenRatio(
+				token1Info,
+				token2Info,
+				PUBLIC_DEXER_V2_FACTORY_ADDR,
+				PUBLIC_DEXER_V2_ROUTER_ADDR
+			),
+			loadUserLiquidity()
+		]);
+
+		if (signal.aborted) return;
+
+		tokensRatio = loadedTokenRatio;
+	};
 
 	const resetOnConfirmed = () => {
 		// Reset ratio
@@ -381,6 +369,9 @@
 
 		// Reset pool share
 		userLiquidityData[3].value = '0%';
+
+		token1Balance = 0;
+		token2Balance = 0;
 	};
 
 	const resetOnNewTickerSelected = () => {

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import type { TokenInfo } from '$lib/types/tokens/Token';
 import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
-import ERC20Abi from '$lib/constants/abi/ERC20Approve';
+import ERC20Abi from '$lib/constants/abi/ERC20';
 
 /**
  * Fetches the balance of a specific token for the connected user.

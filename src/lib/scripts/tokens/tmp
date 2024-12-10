@@ -11,13 +11,13 @@ import type { PairReserves } from '$lib/types/tokens/PairReserves';
 import type { TokenInfo } from '$lib/types/tokens/Token';
 import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
 import getPairAddress from '$lib/scripts/tokens/getPairAddress';
-import pairAbi from '$lib/constants/abi/DexerV2Pair';
-import sortTokens from '$lib/scripts/tokens/sortTokens';
+import routerAbi from '$lib/constants/abi/DexerV2Router';
 
 const getPairReserves = async (
 	token1Info: TokenInfo,
 	token2Info: TokenInfo,
-	factoryAddr: string
+	factoryAddr: string,
+	routerAddr: string
 ): Promise<PairReserves | null> => {
 	try {
 		const provider: ethers.BrowserProvider = getBrowserProvider();
@@ -29,27 +29,17 @@ const getPairReserves = async (
 			provider
 		);
 
+		console.log(`Selected pair address: ${pairAddr}`);
+
 		if (pairAddr === ethers.ZeroAddress) {
 			return null;
 		}
 
-		const pairContract: ethers.Contract = new ethers.Contract(pairAddr, pairAbi, provider);
+		const routerContract: ethers.Contract = new ethers.Contract(routerAddr, routerAbi, provider);
 
-		const reserves: bigint[] = await pairContract.getReserves();
+		const reserves = await routerContract.getReserves(token1Info.address, token2Info.address);
 
-		// Determine token order using sortTokens
-		const [sortedToken0, _] = sortTokens(token1Info.address, token2Info.address);
-
-		// console.log(`Selected tokens:\nToken 1: ${token1Info.address}\nToken 2: ${token2Info.address}`);
-		// console.log(`Sorted tokens:\nToken 1: ${sortedToken0}\nToken 2: ${sorted2}`);
-		// console.log(`Reserves tokens:\nToken 1: ${reserves[0]}\nToken 2: ${reserves[1]}`);
-
-		// Flip reserves if tokens are in the reverse order
-		if (token1Info.address === sortedToken0) {
-			return { reserve1: reserves[0], reserve2: reserves[1] };
-		} else {
-			return { reserve1: reserves[1], reserve2: reserves[0] };
-		}
+		return { reserve1: reserves[0], reserve2: reserves[1] };
 	} catch (e: any) {
 		throw new AppError('Failed to fetch pair reserves.', e.toString());
 	}

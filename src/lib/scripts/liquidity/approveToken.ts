@@ -1,8 +1,8 @@
-import ERC20Abi from '$lib/constants/abi/ERC20Approve';
+import { ethers } from 'ethers';
+import ERC20Abi from '$lib/constants/abi/ERC20';
 import { AppError, isAppError } from '$lib/types/AppError';
 import type { TokenInfo } from '$lib/types/tokens/Token';
-import { ethers } from 'ethers';
-import getBrowserProvider from '../helpers/getBrowserProvider';
+import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
 
 export async function approveTokens(
 	tokenInfo: TokenInfo,
