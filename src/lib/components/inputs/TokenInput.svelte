@@ -11,6 +11,7 @@
 		onInput: (() => void) | null;
 		balance: number;
 		onClickMax: (() => void) | null;
+		checkTheBalance: boolean;
 	};
 
 	const disabledInputClasses: string = 'cursor-not-allowed';
@@ -23,7 +24,8 @@
 		balance = $bindable(0),
 		onInput = null,
 		onSelectTicker = null,
-		onClickMax = null
+		onClickMax = null,
+		checkTheBalance = true
 	}: ComponentProps = $props();
 
 	let inputDisabled: boolean = $state(true);
@@ -44,7 +46,7 @@
 	$effect(() => {
 		if (!amount) return;
 
-		amountExseedsBalance = amount > balance;
+		amountExseedsBalance = amount > balance && checkTheBalance;
 	});
 </script>
 

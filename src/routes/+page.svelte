@@ -16,11 +16,12 @@
 	import { availableTokens } from '$lib/constants/availableTokens';
 	import getUserBalance from '$lib/scripts/tokens/getUserBalance';
 	import loadTokenRatio from '$lib/scripts/tokens/loadTokenRatio';
-	import formatNumber from '$lib/scripts/helpers/formatNumber';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
 	import type { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import { approveTokens } from '$lib/scripts/tokens/approveToken';
 	import { swapTokens } from '$lib/scripts/tokens/swap';
+	import { getPairReserves } from '$lib/scripts/tokens/pairContract';
+	import { ethers } from 'ethers';
 
 	//**************************************************//
 	//** Local constants **//
@@ -149,6 +150,9 @@
 	let token1Balance: number = $state(0);
 	let token2Balance: number = $state(0);
 
+	let reserves1: number | null = $state(null);
+	let reserves2: number | null = $state(null);
+
 	// Abort controllers
 	let tokenRatioAbortController: AbortController | null = $state(null);
 
@@ -164,6 +168,8 @@
 		if (tokensRatio && tokensRatio !== 0) {
 			tokensRatio = 1 / tokensRatio;
 		}
+
+		[reserves1, reserves2] = [reserves2, reserves1];
 	};
 
 	const approveSelectedToken = async () => {
@@ -226,6 +232,8 @@
 	//** Prop functions to components **//
 	//**************************************************//
 	const onTokenInput = (inputToken: 'token1' | 'token2') => {
+		if (reserves1 === null || reserves2 === null) return;
+
 		if (inputToken === 'token1') {
 			if (token1Amount && token1Amount <= 0) token1Amount = 0;
 
@@ -236,7 +244,7 @@
 				return;
 			}
 
-			token2Amount = (token1Amount / tokensRatio) * 0.997;
+			token2Amount = calculateAmountOut(token1Amount, reserves1, reserves2);
 		} else if (inputToken === 'token2') {
 			if (token2Amount && token2Amount <= 0) token2Amount = 0;
 
@@ -247,7 +255,7 @@
 				return;
 			}
 
-			token1Amount = token2Amount * tokensRatio * 0.997;
+			token1Amount = calculateAmountIn(token2Amount, reserves1, reserves2);
 		}
 	};
 
@@ -264,7 +272,9 @@
 			token1Balance = Number(loadedBalance);
 		}
 
-		await loadRatio();
+		if (!token2Info) return;
+
+		await Promise.all([loadRatio(), loadReserves()]);
 	};
 
 	const onSelectTicker2 = async () => {
@@ -280,7 +290,9 @@
 			token2Balance = Number(loadedBalance);
 		}
 
-		await loadRatio();
+		if (!token1Info) return;
+
+		await Promise.all([loadRatio(), loadReserves()]);
 	};
 
 	const onClickMaxToken1 = () => {
@@ -298,6 +310,21 @@
 	//**************************************************//
 	//** Local helper functions **//
 	//**************************************************//
+	async function loadReserves() {
+		if (!token1Info || !token2Info) return;
+
+		try {
+			let reserves = await getPairReserves(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR);
+
+			if (!reserves || reserves.reserve1 === 0n || reserves.reserve2 == 0n) return;
+
+			reserves1 = Number(ethers.formatUnits(reserves.reserve1, token1Info.decimals));
+			reserves2 = Number(ethers.formatUnits(reserves.reserve2, token1Info.decimals));
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 	const resetOnNewTickerSelected = () => {
 		// Reset the amount of tokens
 		token2Amount = null;
@@ -343,6 +370,19 @@
 
 		tokensRatio = loadedTokenRatio;
 	};
+
+	function calculateAmountOut(amountIn: number, reserveIn: number, reserveOut: number) {
+		const amountInWithFee = amountIn * 997;
+		const numerator = amountInWithFee * reserveOut;
+		const denominator = reserveIn * 1000 + amountInWithFee;
+		return numerator / denominator;
+	}
+
+	function calculateAmountIn(amountOut: number, reserveIn: number, reserveOut: number) {
+		const numerator = reserveIn * amountOut * 1000;
+		const denominator = (reserveOut - amountOut) * 997;
+		return numerator / denominator + 1; // Add 1 to account for rounding
+	}
 
 	const showSuccessModal = (hash: string) => {
 		ModalComponent = SuccessModalContent;
@@ -444,6 +484,7 @@
 					}}
 					balance={token1Balance}
 					onClickMax={onClickMaxToken1}
+					checkTheBalance={true}
 				/>
 
 				<TokenInput
@@ -456,6 +497,7 @@
 					}}
 					balance={token2Balance}
 					onClickMax={onClickMaxToken2}
+					checkTheBalance={false}
 				/>
 
 				<!-- GetStart Button-->

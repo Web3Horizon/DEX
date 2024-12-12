@@ -41,6 +41,12 @@
 			<div class="z-10 flex flex-col gap-5">
 				{#each userLiquidities as userLiq}
 					<SingleUserLiquidity data={userLiq} />
+				{:else}
+					<div
+						class="rounded-4xl border border-app_pink bg-gradient-to-t from-[#2C0768] to-[#1A053B] py-6 font-roboto text-white"
+					>
+						<p class="text-xl text-center">You have not provided liquidity</p>
+					</div>
 				{/each}
 			</div>
 		{:catch error}

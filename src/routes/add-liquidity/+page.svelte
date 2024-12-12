@@ -466,6 +466,7 @@
 						}}
 						balance={token1Balance}
 						onClickMax={onClickMaxToken1}
+						checkTheBalance={true}
 					/>
 					<TokenInput
 						bind:selectedTicker={selectedTicker2}
@@ -477,6 +478,7 @@
 						}}
 						balance={token2Balance}
 						onClickMax={onClickMaxToken2}
+						checkTheBalance={true}
 					/>
 				{/if}
 			</div>
