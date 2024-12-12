@@ -32,7 +32,7 @@
 	const liquidityDropDownItems = [
 		{
 			text: 'add liquidity',
-			href: '/addliquidity',
+			href: '/add-liquidity',
 			icon: {
 				width: 24,
 				height: 23,

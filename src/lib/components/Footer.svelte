@@ -38,7 +38,7 @@
 				<a href="/" class="transition-all duration-500 hover:text-[#E018FF]">Swap</a>
 			</li>
 			<li>
-				<a href="/addliquidity" class="transition-all duration-500 hover:text-[#E018FF]"
+				<a href="/add-liquidity" class="transition-all duration-500 hover:text-[#E018FF]"
 					>Liquidity</a
 				>
 			</li>

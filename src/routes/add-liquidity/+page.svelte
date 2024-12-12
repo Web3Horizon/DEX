@@ -3,6 +3,7 @@
 	//** Package imports **//
 	//**************************************************//
 	import Icon from '@iconify/svelte';
+	import { browser } from '$app/environment';
 
 	//**************************************************//
 	//** Environment imports **//
@@ -126,10 +127,23 @@
 		}
 	]);
 
+	let data: UserLiquidity | null = null;
+	if (browser) {
+		data = history?.state?.['sveltekit:states'] || null;
+	}
+
+	if (data && Object.keys(data).length > 0 && $walletConnected) {
+		selectedTicker1 = data.token1.ticker;
+		selectedTicker2 = data.token2.ticker;
+
+		onSelectTicker1();
+		onSelectTicker2();
+	}
+
 	//**************************************************//
 	//** Page functions **//
 	//**************************************************//
-	const loadUserLiquidity = async () => {
+	async function loadUserLiquidity() {
 		if (!$walletConnected || !token1Info || !token2Info) return;
 
 		// Abort any ongoing operation before starting a new one
@@ -176,9 +190,9 @@
 			// Check if signal was aborted before updating the loading state
 			if (!signal.aborted) isLoadingLiquidity = false;
 		}
-	};
+	}
 
-	const approveSelectedTokens = async () => {
+	async function approveSelectedTokens() {
 		if (!token1Info || !token2Info || !token1Amount || !token2Amount) return;
 
 		isApproving = true;
@@ -198,9 +212,9 @@
 		} finally {
 			isApproving = false;
 		}
-	};
+	}
 
-	const confirmAddLiquidity = async () => {
+	async function confirmAddLiquidity() {
 		if (!token1Info || !token2Info || !token1Amount || !token2Amount) return;
 
 		isConfirming = true;
@@ -218,12 +232,12 @@
 		} finally {
 			isConfirming = false;
 		}
-	};
+	}
 
 	//**************************************************//
 	//** Prop functions to components **//
 	//**************************************************//
-	const onTokenInput = (inputToken: 'token1' | 'token2') => {
+	function onTokenInput(inputToken: 'token1' | 'token2') {
 		if (inputToken === 'token1') {
 			if (token1Amount && token1Amount <= 0) token1Amount = 0;
 
@@ -247,51 +261,50 @@
 
 			token1Amount = token2Amount * tokensRatio;
 		}
-	};
+	}
 
-	const onSelectTicker1 = async () => {
+	async function onSelectTicker1() {
 		if (!selectedTicker1 || !$walletConnected) return;
 
 		token1Info = availableTokens[selectedTicker1];
 
 		resetOnNewTickerSelected();
+		let loadedBalance: string | null = await getUserBalance(token1Info);
 
-		let balanceRaw: string | null = await getUserBalance(token1Info);
-
-		if (balanceRaw) {
-			token1Balance = Number(formatNumber(Number(balanceRaw), 5));
+		if (loadedBalance) {
+			token1Balance = Number(loadedBalance);
 		}
 
 		await loadRatioAndLiquidity();
-	};
+	}
 
-	const onSelectTicker2 = async () => {
+	async function onSelectTicker2() {
 		if (!selectedTicker2 || !$walletConnected) return;
 
 		token2Info = availableTokens[selectedTicker2];
 
 		resetOnNewTickerSelected();
 
-		let balanceRaw = await getUserBalance(token2Info);
+		let loadedBalance: string | null = await getUserBalance(token2Info);
 
-		if (balanceRaw) {
-			token2Balance = Number(formatNumber(Number(balanceRaw), 5));
+		if (loadedBalance) {
+			token2Balance = Number(loadedBalance);
 		}
 
 		await loadRatioAndLiquidity();
-	};
+	}
 
-	const onClickMaxToken1 = () => {
+	function onClickMaxToken1() {
 		token1Amount = token1Balance;
 
 		onTokenInput('token1');
-	};
+	}
 
-	const onClickMaxToken2 = () => {
+	function onClickMaxToken2() {
 		token2Amount = token2Balance;
 
 		onTokenInput('token2');
-	};
+	}
 
 	//**************************************************//
 	//** Page effects **//
@@ -314,14 +327,13 @@
 	//**************************************************//
 	//** Helper functions **//
 	//**************************************************//
-	const loadRatioAndLiquidity = async () => {
+	async function loadRatioAndLiquidity() {
 		if (!token1Info || !token2Info) return;
 
 		if (tokenRatioAbortController) tokenRatioAbortController.abort();
 
 		tokenRatioAbortController = new AbortController();
 		const { signal } = tokenRatioAbortController;
-
 		let [loadedTokenRatio] = await Promise.all([
 			loadTokenRatio(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR),
 			loadUserLiquidity()
@@ -330,9 +342,9 @@
 		if (signal.aborted) return;
 
 		tokensRatio = loadedTokenRatio;
-	};
+	}
 
-	const resetOnConfirmed = () => {
+	function resetOnConfirmed() {
 		// Reset ratio
 		tokensRatio = null;
 
@@ -367,33 +379,33 @@
 
 		token1Balance = 0;
 		token2Balance = 0;
-	};
+	}
 
-	const resetOnNewTickerSelected = () => {
+	function resetOnNewTickerSelected() {
 		// Reset the amount of tokens
 		token2Amount = null;
 		token1Amount = null;
 
 		// Reset ratio as old one is no longer valid
 		tokensRatio = null;
-	};
+	}
 
-	const showSuccessModal = () => {
+	function showSuccessModal() {
 		ModalComponent = SuccessModalContent;
 
 		modalTitle = 'Success';
 		modalMsg = 'Liquidity added';
 
 		isModalOpen = true;
-	};
+	}
 
-	const showFailModal = () => {
+	function showFailModal() {
 		ModalComponent = FailModalContent;
 
 		modalTitle = 'Fail';
 		modalMsg = 'Failed to add liquidity';
 		isModalOpen = true;
-	};
+	}
 </script>
 
 <section class="flex flex-col justify-center px-36 pt-32">

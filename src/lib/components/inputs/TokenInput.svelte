@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SelectToken } from '$lib/components';
+	import formatNumber from '$lib/scripts/helpers/formatNumber';
 	import type { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 
 	type ComponentProps = {
@@ -66,7 +67,7 @@
 			>
 				max
 			</button>
-			<span class="text-[10px] font-bold capitalize">balance: {balance}</span>
+			<span class="text-[10px] font-bold capitalize">balance: {formatNumber(balance, 5)}</span>
 		</div>
 	</div>
 	<div class="flex items-center">

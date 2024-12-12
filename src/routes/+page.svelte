@@ -253,10 +253,10 @@
 
 		resetOnNewTickerSelected();
 
-		let balanceRaw: string | null = await getUserBalance(token1Info);
+		let loadedBalance: string | null = await getUserBalance(token1Info);
 
-		if (balanceRaw) {
-			token1Balance = Number(formatNumber(Number(balanceRaw), 5));
+		if (loadedBalance) {
+			token1Balance = Number(loadedBalance);
 		}
 
 		await loadRatio();
@@ -269,10 +269,10 @@
 
 		resetOnNewTickerSelected();
 
-		let balanceRaw = await getUserBalance(token2Info);
+		let loadedBalance: string | null = await getUserBalance(token2Info);
 
-		if (balanceRaw) {
-			token2Balance = Number(formatNumber(Number(balanceRaw), 5));
+		if (loadedBalance) {
+			token2Balance = Number(loadedBalance);
 		}
 
 		await loadRatio();

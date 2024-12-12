@@ -6,6 +6,7 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { availableTokens } from '$lib/constants/availableTokens';
+	import formatNumber from '$lib/scripts/helpers/formatNumber';
 
 	// Data that will be loaded when passed to the
 	// page in state
@@ -30,8 +31,8 @@
 	//**************************************************//
 	//** Local constants **//
 	//**************************************************//
-	const ticker1Image = data?.coin1?.ticker ? availableTokens[data.coin1.ticker].imgPath : null;
-	const ticker2Image = data?.coin2?.ticker ? availableTokens[data.coin2.ticker].imgPath : null;
+	const ticker1Image = data?.token1?.ticker ? availableTokens[data.token1.ticker].imgPath : null;
+	const ticker2Image = data?.token2?.ticker ? availableTokens[data.token2.ticker].imgPath : null;
 
 	const removeAmountQuickButtons = [
 		{
@@ -50,12 +51,12 @@
 	const userCoinsToBeReturned = data
 		? [
 				{
-					ticker: data.coin1.ticker,
+					ticker: data.token1.ticker,
 					amount: token1ExpectedToBeReturned,
 					image: ticker1Image
 				},
 				{
-					ticker: data.coin2.ticker,
+					ticker: data.token2.ticker,
 					amount: token2ExpectedToBeReturned,
 					image: ticker2Image
 				}
@@ -66,15 +67,15 @@
 		? [
 				{
 					title: 'Your pool share:',
-					value: `${data.poolShare}%`
+					value: `${formatNumber(Number(data.poolShare), 2)}%`
 				},
 				{
-					title: data.coin1.ticker.toUpperCase(),
-					value: data.coin1.pooledAmount
+					title: data.token1.ticker.toUpperCase(),
+					value: formatNumber(Number(data.token1.pooledAmount), 3)
 				},
 				{
-					title: data.coin2.ticker.toUpperCase(),
-					value: data.coin2.pooledAmount
+					title: data.token2.ticker.toUpperCase(),
+					value: formatNumber(Number(data.token2.pooledAmount), 3)
 				}
 			]
 		: [];
@@ -93,7 +94,7 @@
 			<!-- Page Heading -->
 			<!-------------------------------------------------->
 			<h2 class=" text-3xl font-bold capitalize">remove liquidity</h2>
-			
+
 			<!-------------------------------------------------->
 			<!-- Remove amount controller box -->
 			<!-------------------------------------------------->
@@ -109,7 +110,7 @@
 						bind:value={removeAmount}
 						type="number"
 						class="rounded-full border-3 border-app_pink bg-transparent p-3 text-xl font-bold placeholder:opacity-10 focus:outline-none"
-						placeholder="Enter your amount"
+						placeholder="Enter amount"
 					/>
 					<!-------------------------------------------------->
 					<!-- Quick input buttons -->
@@ -163,3 +164,12 @@
 		</div>
 	</div>
 </section>
+
+<style>
+	/* Remove the spinners for Chrome, Edge, and Safari */
+	input[type='number']::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+</style>

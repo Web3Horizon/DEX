@@ -10,6 +10,7 @@
 	import type { UserLiquidity } from '$lib/constants/userLiquidity';
 	import { goto } from '$app/navigation';
 	import { availableTokens } from '$lib/constants/availableTokens';
+	import formatNumber from '$lib/scripts/helpers/formatNumber';
 
 	//**************************************************//
 	//** Local type declarations **//
@@ -31,30 +32,30 @@
 	//**************************************************//
 	//** Local constants **//
 	//**************************************************//
-	const tiker1Image = availableTokens[data.coin1.ticker].imgPath;
-	const tiker2Image = availableTokens[data.coin2.ticker].imgPath;
+	const tiker1Image = availableTokens[data.token1.ticker].imgPath;
+	const tiker2Image = availableTokens[data.token2.ticker].imgPath;
 	const userLiquidityDetails = [
 		{
-			property: 'Your total pool tokens:',
-			value: data.poolTokenAmount,
+			property: 'Your total LP tokens:',
+			value: formatNumber(Number(data.poolTokenAmount), 3),
 			image: null,
 			ticker: null
 		},
 		{
-			property: `Pooled ${data.coin1.ticker}:`,
-			value: data.coin1.pooledAmount,
+			property: `Pooled ${data.token1.ticker}:`,
+			value: formatNumber(Number(data.token1.pooledAmount), 3),
 			image: tiker1Image,
-			ticker: data.coin1.ticker
+			ticker: data.token1.ticker
 		},
 		{
-			property: `Polled ${data.coin2.ticker}:`,
-			value: data.coin2.pooledAmount,
+			property: `Polled ${data.token2.ticker}:`,
+			value: formatNumber(Number(data.token2.pooledAmount), 3),
 			image: tiker2Image,
-			ticker: data.coin2.ticker
+			ticker: data.token2.ticker
 		},
 		{
 			property: 'Your pool share:',
-			value: data.poolShare,
+			value: `${formatNumber(Number(data.poolShare), 2)}%`,
 			image: null,
 			ticker: null
 		}
@@ -63,7 +64,7 @@
 		{
 			title: 'add',
 			action: () => {
-				goto('/addliquidity', { state: data });
+				goto('/add-liquidity', { state: data });
 			}
 		},
 		{
@@ -91,11 +92,11 @@
 	<div class="flex w-full items-center justify-between">
 		<div class="flex items-center gap-1">
 			<div class="flex gap-0.5">
-				<img src={tiker1Image} alt="{data.coin1.ticker} coin" class="h-8" />
-				<img src={tiker2Image} alt="{data.coin2.ticker} coin" class="h-8" />
+				<img src={tiker1Image} alt="{data.token1.ticker} coin" class="h-8" />
+				<img src={tiker2Image} alt="{data.token2.ticker} coin" class="h-8" />
 			</div>
 			<div class="font-roboto text-xl font-bold text-white">
-				{data.coin1.ticker}/{data.coin2.ticker}
+				{data.token1.ticker}/{data.token2.ticker}
 			</div>
 		</div>
 
