@@ -40,10 +40,6 @@ const getPairReserves = async (
 		// Determine token order using sortTokens
 		const [sortedToken0, _] = sortTokens(token1Info.address, token2Info.address);
 
-		// console.log(`Selected tokens:\nToken 1: ${token1Info.address}\nToken 2: ${token2Info.address}`);
-		// console.log(`Sorted tokens:\nToken 1: ${sortedToken0}\nToken 2: ${sorted2}`);
-		// console.log(`Reserves tokens:\nToken 1: ${reserves[0]}\nToken 2: ${reserves[1]}`);
-
 		// Flip reserves if tokens are in the reverse order
 		if (token1Info.address === sortedToken0) {
 			return { reserve1: reserves[0], reserve2: reserves[1] };

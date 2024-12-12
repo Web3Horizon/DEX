@@ -1,9 +1,16 @@
 <script lang="ts">
-	import { onMount, onDestroy, type Component } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	import { PUBLIC_DEXER_V2_FACTORY_ADDR, PUBLIC_DEXER_V2_ROUTER_ADDR } from '$env/static/public';
 
-	import { Modal, TokenInput, Mascot, GetStart } from '$lib/components';
+	import {
+		Modal,
+		TokenInput,
+		Mascot,
+		GetStart,
+		SuccessModalContent,
+		FailModalContent
+	} from '$lib/components';
 	import { Swapicon } from '$lib/assets/icons';
 	import { walletConnected } from '$lib/stores/wallet';
 	import { availableTokens } from '$lib/constants/availableTokens';
@@ -119,7 +126,9 @@
 
 	// Modal controller variables
 	let isModalOpen = $state(false);
-	let ModalComponent: Component | null = $state(null);
+	let ModalComponent: typeof SuccessModalContent | typeof FailModalContent | null = $state(null);
+	let modalMsg: string | null = $state(null);
+	let modalTitle: string | null = $state(null);
 
 	// User input amounts for each token
 	let token1Amount: number | null = $state(null);
@@ -182,12 +191,19 @@
 		try {
 			let path: string[] = [token1Info.address, token2Info.address];
 
-			const result = await swapTokens(PUBLIC_DEXER_V2_ROUTER_ADDR, token1Amount, token1Info, path);
+			const hash: string = await swapTokens(
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token1Amount,
+				token1Info,
+				path
+			);
 
-			console.log(result);
+			showSuccessModal(hash);
 
 			resetOnSwapped();
 		} catch (error) {
+			showFailModal();
+
 			console.error('Swap failed:', error);
 		} finally {
 			isSwapping = false;
@@ -215,7 +231,7 @@
 				return;
 			}
 
-			token2Amount = token1Amount / tokensRatio;
+			token2Amount = (token1Amount / tokensRatio) * 0.97;
 		} else if (inputToken === 'token2') {
 			if (token2Amount && token2Amount <= 0) token2Amount = 0;
 
@@ -226,7 +242,7 @@
 				return;
 			}
 
-			token1Amount = token2Amount * tokensRatio;
+			token1Amount = token2Amount * tokensRatio * 0.97;
 		}
 	};
 
@@ -313,15 +329,30 @@
 		const loadedTokenRatio = await loadTokenRatio(
 			token1Info,
 			token2Info,
-			PUBLIC_DEXER_V2_FACTORY_ADDR,
-			PUBLIC_DEXER_V2_ROUTER_ADDR
+			PUBLIC_DEXER_V2_FACTORY_ADDR
 		);
-
-		console.log(loadedTokenRatio);
 
 		if (signal.aborted) return;
 
 		tokensRatio = loadedTokenRatio;
+	};
+
+	const showSuccessModal = (hash: string) => {
+		ModalComponent = SuccessModalContent;
+
+		modalTitle = 'Success';
+		modalMsg = `Transaction hash: ${hash}`;
+
+		isModalOpen = true;
+	};
+
+	const showFailModal = () => {
+		ModalComponent = FailModalContent;
+
+		modalTitle = 'Fail';
+		modalMsg = 'Failed to swap tokens';
+
+		isModalOpen = true;
 	};
 
 	//**************************************************//
@@ -458,7 +489,7 @@
 </section>
 
 <Modal bind:isOpen={isModalOpen}>
-	{#if ModalComponent}
-		<!-- <ModalComponent /> -->
+	{#if ModalComponent && modalMsg && modalTitle}
+		<ModalComponent msg={modalMsg} title={modalTitle} />
 	{/if}
 </Modal>

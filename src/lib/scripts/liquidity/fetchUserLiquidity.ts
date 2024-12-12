@@ -23,15 +23,13 @@ import type { PairReserves } from '$lib/types/tokens/PairReserves';
 const fetchUserLiquidity = async (
 	token1Info: TokenInfo,
 	token2Info: TokenInfo,
-	factoryAddr: string,
-	routerAddr: string
+	factoryAddr: string
 ): Promise<UserLiquidity | null> => {
 	try {
 		const reserves: PairReserves | null = await getPairReserves(
 			token1Info,
 			token2Info,
-			factoryAddr,
-			routerAddr
+			factoryAddr
 		);
 
 		if (reserves === null) return null;

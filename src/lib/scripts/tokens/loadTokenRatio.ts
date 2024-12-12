@@ -4,10 +4,9 @@ import getPairReserves from './getPairReserves';
 const loadTokenRatio = async (
 	token1Info: TokenInfo,
 	token2Info: TokenInfo,
-	factoryAddr: string,
-	routerAddr: string
+	factoryAddr: string
 ): Promise<number | null> => {
-	const reserves = await getPairReserves(token1Info, token2Info, factoryAddr, routerAddr);
+	const reserves = await getPairReserves(token1Info, token2Info, factoryAddr);
 
 	if (!reserves || reserves.reserve1 === 0n || reserves.reserve2 === 0n) {
 		return null;

@@ -36,7 +36,6 @@
 	import { walletConnected } from '$lib/stores/wallet';
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
-	import type { Component } from 'svelte';
 	import getUserBalance from '$lib/scripts/tokens/getUserBalance';
 	import loadTokenRatio from '$lib/scripts/tokens/loadTokenRatio';
 	import formatNumber from '$lib/scripts/helpers/formatNumber';
@@ -63,7 +62,9 @@
 
 	// Modal controller variables
 	let isModalOpen = $state(false);
-	let ModalComponent: Component | null = $state(null);
+	let ModalComponent: typeof SuccessModalContent | typeof FailModalContent | null = $state(null);
+	let modalTitle: string | null = $state(null);
+	let modalMsg: string | null = $state(null);
 
 	// State of loading user liquidity
 	let isLoadingLiquidity: boolean = $state(false);
@@ -150,8 +151,7 @@
 			let result: UserLiquidity | null = await fetchUserLiquidity(
 				token1Info,
 				token2Info,
-				PUBLIC_DEXER_V2_FACTORY_ADDR,
-				PUBLIC_DEXER_V2_ROUTER_ADDR
+				PUBLIC_DEXER_V2_FACTORY_ADDR
 			);
 
 			// Check if the signal was aborted after the operation
@@ -323,12 +323,7 @@
 		const { signal } = tokenRatioAbortController;
 
 		let [loadedTokenRatio] = await Promise.all([
-			loadTokenRatio(
-				token1Info,
-				token2Info,
-				PUBLIC_DEXER_V2_FACTORY_ADDR,
-				PUBLIC_DEXER_V2_ROUTER_ADDR
-			),
+			loadTokenRatio(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR),
 			loadUserLiquidity()
 		]);
 
@@ -385,11 +380,18 @@
 
 	const showSuccessModal = () => {
 		ModalComponent = SuccessModalContent;
+
+		modalTitle = 'Success';
+		modalMsg = 'Liquidity added';
+
 		isModalOpen = true;
 	};
 
 	const showFailModal = () => {
 		ModalComponent = FailModalContent;
+
+		modalTitle = 'Fail';
+		modalMsg = 'Failed to add liquidity';
 		isModalOpen = true;
 	};
 </script>
@@ -546,7 +548,7 @@
 </section>
 
 <Modal bind:isOpen={isModalOpen}>
-	{#if ModalComponent}
-		<ModalComponent />
+	{#if ModalComponent && modalMsg && modalTitle}
+		<ModalComponent msg={modalMsg} title={modalTitle} />
 	{/if}
 </Modal>
