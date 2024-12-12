@@ -15,7 +15,6 @@ export const addLiquidity = async (
 	try {
 		let provider = getBrowserProvider();
 		const signer = await provider.getSigner();
-		const addr = await signer.getAddress();
 
 		// Get Router Contract Instance
 		const routerContract = new ethers.Contract(
@@ -25,13 +24,13 @@ export const addLiquidity = async (
 		);
 
 		// Convert user input to raw token amounts (on-chain representation)
-		let token1RawAmount = ethers.parseUnits(token1Amount.toString(), token1Info.decimals);
-		let token2RawAmount = ethers.parseUnits(token2Amount.toString(), token2Info.decimals);
+		let token1RawAmount: bigint = ethers.parseUnits(token1Amount.toString(), token1Info.decimals);
+		let token2RawAmount: bigint = ethers.parseUnits(token2Amount.toString(), token2Info.decimals);
 
-		let token1MinAmount =
+		let token1MinAmount: bigint =
 			token1RawAmount -
 			(token1RawAmount * BigInt(Number(PUBLIC_SLIPPAGE_TOLERANCE) * 1e18)) / BigInt(1e18);
-		let token2MinAmount =
+		let token2MinAmount: bigint =
 			token2RawAmount -
 			(token2RawAmount * BigInt(Number(PUBLIC_SLIPPAGE_TOLERANCE) * 1e18)) / BigInt(1e18);
 
@@ -51,7 +50,7 @@ export const addLiquidity = async (
 			token2RawAmount,
 			token1MinAmount,
 			token2MinAmount,
-			addr
+			signer.address
 		);
 
 		// Wait for transaction to complete
@@ -62,7 +61,8 @@ export const addLiquidity = async (
 		if (isAppError(e)) {
 			throw e;
 		} else {
-			throw new AppError('Unexpected error occured while adding liquidity:', e.toString());
+			console.error(e);
+			throw new AppError('Unexpected error occured while adding liquidity:', null);
 		}
 	}
 };

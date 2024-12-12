@@ -13,9 +13,8 @@ export async function connectWallet(): Promise<null | AppError> {
 		const previouslyConnectedAddress = localStorage.getItem('connectedWalletAddress');
 		if (previouslyConnectedAddress) {
 			const signer: ethers.JsonRpcSigner = await provider.getSigner();
-			const address: string = await signer.getAddress();
 
-			if (address === previouslyConnectedAddress) {
+			if (signer.address === previouslyConnectedAddress) {
 				setupAccountChangeListener();
 				walletConnected.set(true);
 				return null;
@@ -26,10 +25,9 @@ export async function connectWallet(): Promise<null | AppError> {
 		await window.ethereum!.request({ method: 'eth_requestAccounts' });
 
 		const signer: ethers.JsonRpcSigner = await provider.getSigner();
-		const address: string = await signer.getAddress();
 
 		// Save connected wallet address
-		localStorage.setItem('connectedWalletAddress', address);
+		localStorage.setItem('connectedWalletAddress', signer.address);
 		walletConnected.set(true);
 
 		// Set up listener for account changes

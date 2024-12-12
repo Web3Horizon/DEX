@@ -124,35 +124,6 @@ const dexerV2RouterAbi = [
 	},
 	{
 		type: 'function',
-		name: 'getReserves',
-		inputs: [
-			{
-				name: 'tokenA',
-				type: 'address',
-				internalType: 'address'
-			},
-			{
-				name: 'tokenB',
-				type: 'address',
-				internalType: 'address'
-			}
-		],
-		outputs: [
-			{
-				name: 'reserveA',
-				type: 'uint256',
-				internalType: 'uint256'
-			},
-			{
-				name: 'reserveB',
-				type: 'uint256',
-				internalType: 'uint256'
-			}
-		],
-		stateMutability: 'view'
-	},
-	{
-		type: 'function',
 		name: 'i_factory',
 		inputs: [],
 		outputs: [

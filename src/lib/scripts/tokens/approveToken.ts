@@ -1,11 +1,11 @@
 import { ethers } from 'ethers';
 import ERC20Abi from '$lib/constants/abi/ERC20';
 import { AppError, isAppError } from '$lib/types/AppError';
-import type { TokenInfo } from '$lib/types/tokens/Token';
 import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
 
 export async function approveTokens(
-	tokenInfo: TokenInfo,
+	tokenAddress: string,
+	tokenDecimals: number,
 	routerAddress: string,
 	amount: string
 ): Promise<null> {
@@ -13,19 +13,19 @@ export async function approveTokens(
 		let provider = getBrowserProvider();
 
 		const signer = await provider.getSigner();
-		const tokenContract = new ethers.Contract(tokenInfo.address, ERC20Abi, signer);
+
+		const tokenContract = new ethers.Contract(tokenAddress, ERC20Abi, signer);
 
 		// Convert human-readable amount to blockchain units
-		const amountInBlockchainFormat = ethers.parseUnits(amount, tokenInfo.decimals);
+		const amountInBlockchainFormat = ethers.parseUnits(amount, tokenDecimals);
 
 		const allowance = await tokenContract.allowance(signer.address, routerAddress);
 
 		// Check if allowance is already sufficient
 		if (allowance >= amountInBlockchainFormat) return null;
 
-		const tx = await tokenContract.approve(routerAddress, amountInBlockchainFormat, {
-			gasLimit: 1000000
-		});
+		const tx = await tokenContract.approve(routerAddress, amountInBlockchainFormat);
+
 		await tx.wait();
 
 		return null;

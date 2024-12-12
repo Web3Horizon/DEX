@@ -15,8 +15,6 @@ const getUserBalance = async (tokenInfo: TokenInfo): Promise<string | null> => {
 
 		const signer: ethers.JsonRpcSigner = await provider.getSigner();
 
-		const userAddr: string = await signer.getAddress();
-
 		const tokenContract: ethers.Contract = new ethers.Contract(
 			tokenInfo.address,
 			ERC20Abi,
@@ -25,7 +23,7 @@ const getUserBalance = async (tokenInfo: TokenInfo): Promise<string | null> => {
 
 		// Fetch the balance and decimals
 		const [rawBalance, decimals] = await Promise.all([
-			tokenContract.balanceOf(userAddr),
+			tokenContract.balanceOf(signer.address),
 			tokenContract.decimals()
 		]);
 

@@ -19,7 +19,7 @@
 	import formatNumber from '$lib/scripts/helpers/formatNumber';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
 	import type { TokenTickers } from '$lib/types/tokens/AvailableTokens';
-	import { approveTokens } from '$lib/scripts/liquidity/approveToken';
+	import { approveTokens } from '$lib/scripts/tokens/approveToken';
 	import { swapTokens } from '$lib/scripts/tokens/swap';
 
 	//**************************************************//
@@ -173,7 +173,12 @@
 
 		try {
 			// Will throw an AppError if any occured
-			await approveTokens(token1Info, PUBLIC_DEXER_V2_ROUTER_ADDR, token1Amount.toString());
+			await approveTokens(
+				token1Info.address,
+				token1Info.decimals,
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token1Amount.toString()
+			);
 
 			isApproved = true;
 		} catch (e) {
@@ -231,7 +236,7 @@
 				return;
 			}
 
-			token2Amount = (token1Amount / tokensRatio) * 0.97;
+			token2Amount = (token1Amount / tokensRatio) * 0.997;
 		} else if (inputToken === 'token2') {
 			if (token2Amount && token2Amount <= 0) token2Amount = 0;
 
@@ -242,7 +247,7 @@
 				return;
 			}
 
-			token1Amount = token2Amount * tokensRatio * 0.97;
+			token1Amount = token2Amount * tokensRatio * 0.997;
 		}
 	};
 
@@ -316,6 +321,8 @@
 
 		token1Balance = 0;
 		token2Balance = 0;
+
+		isApproved = false;
 	};
 
 	const loadRatio = async () => {

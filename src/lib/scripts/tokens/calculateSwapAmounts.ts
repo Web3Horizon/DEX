@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import DexerV2RouterAbi from '$lib/constants/abi/DexerV2Router';
 import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
+import { AppError } from '$lib/types/AppError';
 
 /**
  * Calculate the swap amounts using the router contract
@@ -21,8 +22,7 @@ export const calculateSwapAmounts = async (
 		const amountsOut = await routerContract.getAmountsOut(amountIn, path);
 
 		return amountsOut.map((amount: ethers.Numeric) => Number(ethers.formatUnits(amount, 18)));
-	} catch (error) {
-		console.error('Failed to calculate swap amounts:', error);
-		throw new Error('Failed to calculate swap amounts.');
+	} catch (error: any) {
+		throw new AppError('Failed to calculate swap amounts.', error.toString());
 	}
 };

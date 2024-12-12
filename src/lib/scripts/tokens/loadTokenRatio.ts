@@ -1,5 +1,5 @@
 import type { TokenInfo } from '$lib/types/tokens/Token';
-import getPairReserves from './getPairReserves';
+import { getPairReserves } from '$lib/scripts/tokens/pairContract';
 
 const loadTokenRatio = async (
 	token1Info: TokenInfo,

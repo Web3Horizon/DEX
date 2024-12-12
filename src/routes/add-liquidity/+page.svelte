@@ -32,7 +32,7 @@
 	import { availableTokens } from '$lib/constants/availableTokens';
 	import type { UserLiquidity } from '$lib/constants/userLiquidity';
 	import fetchUserLiquidity from '$lib/scripts/liquidity/fetchUserLiquidity';
-	import { approveTokens } from '$lib/scripts/liquidity/approveToken';
+	import { approveTokens } from '$lib/scripts/tokens/approveToken';
 	import { addLiquidity } from '$lib/scripts/liquidity/addLiquidity';
 	import { walletConnected } from '$lib/stores/wallet';
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
@@ -200,11 +200,21 @@
 		try {
 			// Approve token1
 			// Will throw an AppError if any occured
-			await approveTokens(token1Info, PUBLIC_DEXER_V2_ROUTER_ADDR, token1Amount.toString());
+			await approveTokens(
+				token1Info.address,
+				token1Info.decimals,
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token1Amount.toString()
+			);
 
 			// Approve token2
 			// Will throw an AppError if any occured
-			await approveTokens(token2Info, PUBLIC_DEXER_V2_ROUTER_ADDR, token2Amount.toString());
+			await approveTokens(
+				token2Info.address,
+				token2Info.decimals,
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token2Amount.toString()
+			);
 
 			isApproved = true;
 		} catch (e) {
@@ -228,6 +238,7 @@
 			resetOnConfirmed();
 		} catch (error) {
 			showFailModal();
+
 			console.error('An error occurred:', error);
 		} finally {
 			isConfirming = false;
@@ -334,6 +345,7 @@
 
 		tokenRatioAbortController = new AbortController();
 		const { signal } = tokenRatioAbortController;
+
 		let [loadedTokenRatio] = await Promise.all([
 			loadTokenRatio(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR),
 			loadUserLiquidity()

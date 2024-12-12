@@ -23,7 +23,6 @@ export const swapTokens = async (
 	try {
 		const provider = getBrowserProvider();
 		const signer = await provider.getSigner();
-		const addr = await signer.getAddress();
 
 		let amountsOut = await getSwapAmountsOut(
 			PUBLIC_DEXER_V2_ROUTER_ADDR,
@@ -39,10 +38,7 @@ export const swapTokens = async (
 			amountInRaw,
 			amountsOut[1],
 			path,
-			addr,
-			{
-				gasLimit: 1000000
-			}
+			signer.address
 		);
 
 		await tx.wait();
