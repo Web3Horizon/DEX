@@ -435,8 +435,8 @@
 	});
 </script>
 
-<section class="flex h-screen flex-row space-x-80 pl-16 pt-48">
-	<div class="flex w-[500px] flex-col gap-5 font-roboto text-white">
+<section class="m-auto flex h-screen justify-around pt-48">
+	<div class="flex min-w-[500px] flex-col font-roboto text-white">
 		{#if !$walletConnected}
 			<!-- Show taglines while wallet is not connected -->
 			<h1 class="text-nowrap font-roboto text-6xl font-bold uppercase">
@@ -533,7 +533,7 @@
 			</div>
 		{/if}
 	</div>
-	<div class="flex justify-end">
+	<div class="flex min-w-[500px] justify-center">
 		<Mascot />
 	</div>
 </section>

@@ -10,4 +10,4 @@ export { default as Discord } from './Discord.svelte';
 export { default as Github } from './Github.svelte';
 export { default as Whatsaap } from './Whatsaap.svelte';
 export { default as Google } from './Google.svelte';
-export { default as Swapicon } from './Swapicon.svelte';
+export { default as Swapicon } from './swapicon.svelte';
