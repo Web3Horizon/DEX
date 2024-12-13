@@ -15,10 +15,10 @@ import {
 //**************************************************//
 //** Import paths to coin images **//
 //**************************************************//
-import TOKENA from '$lib/assets/img/coins/coin1.png';
-import TOKENB from '$lib/assets/img/coins/coin2.png';
-import TOKENC from '$lib/assets/img/coins/coin3.png';
-import TOKEND from '$lib/assets/img/coins/coin4.png';
+import SLV from '$lib/assets/img/coins/slv.png';
+import GLD from '$lib/assets/img/coins/gld.png';
+import PLT from '$lib/assets/img/coins/plt.png';
+import RUBY from '$lib/assets/img/coins/ruby.png';
 
 //**************************************************//
 //** Type imports **//
@@ -27,28 +27,28 @@ import { TokenTickers, type AvailableTokens } from '$lib/types/tokens/AvailableT
 
 // Map of all the available tokens in the app
 export const availableTokens: AvailableTokens = {
-	TOKENA: {
-		ticker: TokenTickers.TOKENA,
-		address: PUBLIC_TOKEN_A_ADDR,
-		imgPath: TOKENA,
-		decimals: Number(PUBLIC_TOKEN_A_DECIMALS)
-	},
-	TOKENB: {
-		ticker: TokenTickers.TOKENB,
+	SLV: {
+		ticker: TokenTickers.SLV,
 		address: PUBLIC_TOKEN_B_ADDR,
-		imgPath: TOKENB,
+		imgPath: SLV,
 		decimals: Number(PUBLIC_TOKEN_B_DECIMALS)
 	},
-	TOKENC: {
-		ticker: TokenTickers.TOKENC,
+	GLD: {
+		ticker: TokenTickers.GLD,
+		address: PUBLIC_TOKEN_A_ADDR,
+		imgPath: GLD,
+		decimals: Number(PUBLIC_TOKEN_A_DECIMALS)
+	},
+	PLT: {
+		ticker: TokenTickers.PLT,
 		address: PUBLIC_TOKEN_C_ADDR,
-		imgPath: TOKENC,
+		imgPath: PLT,
 		decimals: Number(PUBLIC_TOKEN_C_DECIMALS)
 	},
-	TOKEND: {
-		ticker: TokenTickers.TOKEND,
+	RUBY: {
+		ticker: TokenTickers.RUBY,
 		address: PUBLIC_TOKEN_D_ADDR,
-		imgPath: TOKEND,
+		imgPath: RUBY,
 		decimals: Number(PUBLIC_TOKEN_D_DECIMALS)
 	}
 };
