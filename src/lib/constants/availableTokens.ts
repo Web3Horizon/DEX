@@ -52,3 +52,16 @@ export const availableTokens: AvailableTokens = {
 		decimals: Number(PUBLIC_TOKEN_D_DECIMALS)
 	}
 };
+
+export const addressToTickerMap = generateAddressToTickerMap();
+
+function generateAddressToTickerMap(): Record<string, TokenTickers> {
+	const map: Record<string, TokenTickers> = {};
+
+	for (const ticker in availableTokens) {
+		const token = availableTokens[ticker as TokenTickers];
+		map[token.address] = ticker as TokenTickers;
+	}
+
+	return map;
+}

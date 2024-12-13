@@ -44,6 +44,19 @@ const dexerV2FactoryAbi = [
 	},
 	{
 		type: 'function',
+		name: 'getAllPairs',
+		inputs: [],
+		outputs: [
+			{
+				name: '',
+				type: 'address[]',
+				internalType: 'address[]'
+			}
+		],
+		stateMutability: 'view'
+	},
+	{
+		type: 'function',
 		name: 'pairs',
 		inputs: [
 			{

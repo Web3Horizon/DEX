@@ -8,19 +8,14 @@
 	import Icon from '@iconify/svelte';
 
 	let isConnecting = $state(false);
-	let isModalOpen = $state(false);
+	// let isModalOpen = $state(false);
 	const walletIconWidth = 24;
 	const walletIconHeight = 25;
 
 	const connect = async () => {
 		isConnecting = true;
-		let result = await connectWallet();
+		await connectWallet();
 		isConnecting = false;
-
-		if (result === null) {
-			// Show the success message
-			isModalOpen = true;
-		}
 	};
 
 	onMount(async () => {
@@ -36,14 +31,14 @@
 </script>
 
 {#if $walletConnected}
-	<div
-		class=" font-roboto border-3 flex items-center gap-2.5 rounded-full border-[#E018FF] px-10 py-2.5 text-base font-bold text-white"
+	<button
+		class="flex items-center gap-2.5 rounded-full border-3 border-app_pink px-10 py-2.5 font-roboto text-base font-bold text-white transition-all duration-300 hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink"
 	>
-		<span> Approve </span>
-	</div>
+		<span>Approve</span>
+	</button>
 {:else}
 	<button
-		class="font-roboto hover:shadow-app-button border-3 moving-light-button flex items-center gap-2.5 rounded-full border-[#E018FF] stroke-white px-5 py-2.5 text-base font-bold text-white transition-all duration-300 hover:bg-[#E018FF] hover:shadow-[#E018FF]"
+		class="moving-light-button flex items-center gap-2.5 rounded-full border-3 border-app_pink stroke-white px-5 py-2.5 font-roboto text-base font-bold text-white transition-all duration-300 hover:bg-app_pink hover:shadow-app-button hover:shadow-app_pink"
 		disabled={isConnecting}
 		class:cursor-not-allowed={isConnecting}
 		onclick={connect}
@@ -62,6 +57,6 @@
 				height={walletIconHeight}
 				class="text-white"
 			/>
-	{/if}
+		{/if}
 	</button>
 {/if}

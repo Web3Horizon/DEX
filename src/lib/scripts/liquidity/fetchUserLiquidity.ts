@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 //** ABI imports **//
 //**************************************************//
 import pairAbi from '$lib/constants/abi/DexerV2Pair';
-import erc20Abi from '$lib/constants/abi/ERC20Approve';
+import erc20Abi from '$lib/constants/abi/ERC20';
 
 //**************************************************//
 //** Other library imports **//
@@ -16,14 +16,13 @@ import { AppError, isAppError } from '$lib/types/AppError';
 import getBrowserProvider from '$lib/scripts/helpers/getBrowserProvider';
 import type { TokenInfo } from '$lib/types/tokens/Token';
 import type { PooledTokenDetails, UserLiquidity } from '$lib/constants/userLiquidity';
-import getPairAddress from '$lib/scripts/tokens/getPairAddress';
-import getPairReserves from '$lib/scripts/tokens/getPairReserves';
 import type { PairReserves } from '$lib/types/tokens/PairReserves';
+import { getPairAddress, getPairReserves } from '$lib/scripts/tokens/pairContract';
 
 const fetchUserLiquidity = async (
-	factoryAddr: string,
 	token1Info: TokenInfo,
-	token2Info: TokenInfo
+	token2Info: TokenInfo,
+	factoryAddr: string
 ): Promise<UserLiquidity | null> => {
 	try {
 		const reserves: PairReserves | null = await getPairReserves(
@@ -32,7 +31,7 @@ const fetchUserLiquidity = async (
 			factoryAddr
 		);
 
-		if (reserves === null) return null;
+		if (!reserves || reserves.reserve1 === 0n || reserves.reserve2 === 0n) return null;
 
 		const provider: ethers.BrowserProvider = getBrowserProvider();
 
@@ -43,8 +42,7 @@ const fetchUserLiquidity = async (
 			provider
 		);
 
-		let signer: ethers.JsonRpcSigner = await provider.getSigner();
-		let userAddr: string = await signer.getAddress();
+		const signer: ethers.JsonRpcSigner = await provider.getSigner();
 
 		const pairContract: ethers.Contract = new ethers.Contract(pairAddr, pairAbi, provider);
 		const token1Contract: ethers.Contract = new ethers.Contract(
@@ -68,7 +66,7 @@ const fetchUserLiquidity = async (
 		]);
 
 		// Fetch user LP token balance
-		const poolTokenBalance: bigint = await pairContract.balanceOf(userAddr);
+		const poolTokenBalance: bigint = await pairContract.balanceOf(signer.address);
 
 		// Calculate pool share
 		const poolShare: string = ((poolTokenBalance * 100n) / totalSupply).toString();

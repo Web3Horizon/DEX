@@ -3,6 +3,7 @@
 	//** Package imports **//
 	//**************************************************//
 	import Icon from '@iconify/svelte';
+	import { browser } from '$app/environment';
 
 	//**************************************************//
 	//** Environment imports **//
@@ -31,14 +32,14 @@
 	import { availableTokens } from '$lib/constants/availableTokens';
 	import type { UserLiquidity } from '$lib/constants/userLiquidity';
 	import fetchUserLiquidity from '$lib/scripts/liquidity/fetchUserLiquidity';
-	import { approveTokens } from '$lib/scripts/liquidity/approveToken';
+	import { approveTokens } from '$lib/scripts/tokens/approveToken';
 	import { addLiquidity } from '$lib/scripts/liquidity/addLiquidity';
 	import { walletConnected } from '$lib/stores/wallet';
 	import { TokenTickers } from '$lib/types/tokens/AvailableTokens';
 	import type { TokenInfo } from '$lib/types/tokens/Token';
-	import getPairReserves from '$lib/scripts/tokens/getPairReserves';
-	import type { Component } from 'svelte';
 	import getUserBalance from '$lib/scripts/tokens/getUserBalance';
+	import loadTokenRatio from '$lib/scripts/tokens/loadTokenRatio';
+	import formatNumber from '$lib/scripts/helpers/formatNumber';
 
 	//**************************************************//
 	//** Local types **//
@@ -62,7 +63,9 @@
 
 	// Modal controller variables
 	let isModalOpen = $state(false);
-	let ModalComponent: Component | null = $state(null);
+	let ModalComponent: typeof SuccessModalContent | typeof FailModalContent | null = $state(null);
+	let modalTitle: string | null = $state(null);
+	let modalMsg: string | null = $state(null);
 
 	// State of loading user liquidity
 	let isLoadingLiquidity: boolean = $state(false);
@@ -124,35 +127,23 @@
 		}
 	]);
 
+	let data: UserLiquidity | null = null;
+	if (browser) {
+		data = history?.state?.['sveltekit:states'] || null;
+	}
+
+	if (data && Object.keys(data).length > 0 && $walletConnected) {
+		selectedTicker1 = data.token1.ticker;
+		selectedTicker2 = data.token2.ticker;
+
+		onSelectTicker1();
+		onSelectTicker2();
+	}
+
 	//**************************************************//
 	//** Page functions **//
 	//**************************************************//
-	const loadTokenRatio = async () => {
-		if (!token1Info || !token2Info) return;
-
-		// Abort any ongoing operation before starting a new one
-		if (tokenRatioAbortController) tokenRatioAbortController.abort();
-
-		// Create a new AbortController instance for this operation
-		tokenRatioAbortController = new AbortController();
-		const { signal } = new AbortController();
-
-		const reserves = await getPairReserves(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR);
-
-		// Do not apply promise results if operation
-		// has been aborted
-		if (signal.aborted) return;
-
-		if (!reserves || reserves.reserve1 === 0n || reserves.reserve2 === 0n) {
-			tokensRatio = null;
-			return null;
-		}
-
-		tokensRatio = Number(reserves.reserve1) / Number(reserves.reserve2);
-		return tokensRatio;
-	};
-
-	const loadUserLiquidity = async () => {
+	async function loadUserLiquidity() {
 		if (!$walletConnected || !token1Info || !token2Info) return;
 
 		// Abort any ongoing operation before starting a new one
@@ -172,9 +163,9 @@
 
 		try {
 			let result: UserLiquidity | null = await fetchUserLiquidity(
-				PUBLIC_DEXER_V2_FACTORY_ADDR,
 				token1Info,
-				token2Info
+				token2Info,
+				PUBLIC_DEXER_V2_FACTORY_ADDR
 			);
 
 			// Check if the signal was aborted after the operation
@@ -199,9 +190,9 @@
 			// Check if signal was aborted before updating the loading state
 			if (!signal.aborted) isLoadingLiquidity = false;
 		}
-	};
+	}
 
-	const approveSelectedTokens = async () => {
+	async function approveSelectedTokens() {
 		if (!token1Info || !token2Info || !token1Amount || !token2Amount) return;
 
 		isApproving = true;
@@ -209,11 +200,21 @@
 		try {
 			// Approve token1
 			// Will throw an AppError if any occured
-			await approveTokens(token1Info, PUBLIC_DEXER_V2_ROUTER_ADDR, token1Amount.toString());
+			await approveTokens(
+				token1Info.address,
+				token1Info.decimals,
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token1Amount.toString()
+			);
 
 			// Approve token2
 			// Will throw an AppError if any occured
-			await approveTokens(token2Info, PUBLIC_DEXER_V2_ROUTER_ADDR, token2Amount.toString());
+			await approveTokens(
+				token2Info.address,
+				token2Info.decimals,
+				PUBLIC_DEXER_V2_ROUTER_ADDR,
+				token2Amount.toString()
+			);
 
 			isApproved = true;
 		} catch (e) {
@@ -221,9 +222,9 @@
 		} finally {
 			isApproving = false;
 		}
-	};
+	}
 
-	const confirmAddLiquidity = async () => {
+	async function confirmAddLiquidity() {
 		if (!token1Info || !token2Info || !token1Amount || !token2Amount) return;
 
 		isConfirming = true;
@@ -237,16 +238,17 @@
 			resetOnConfirmed();
 		} catch (error) {
 			showFailModal();
+
 			console.error('An error occurred:', error);
 		} finally {
 			isConfirming = false;
 		}
-	};
+	}
 
 	//**************************************************//
 	//** Prop functions to components **//
 	//**************************************************//
-	const onTokenInput = (inputToken: 'token1' | 'token2') => {
+	function onTokenInput(inputToken: 'token1' | 'token2') {
 		if (inputToken === 'token1') {
 			if (token1Amount && token1Amount <= 0) token1Amount = 0;
 
@@ -257,7 +259,7 @@
 				return;
 			}
 
-			token2Amount = token1Amount * tokensRatio;
+			token2Amount = token1Amount / tokensRatio;
 		} else if (inputToken === 'token2') {
 			if (token2Amount && token2Amount <= 0) token2Amount = 0;
 
@@ -268,58 +270,56 @@
 				return;
 			}
 
-			token1Amount = token2Amount / tokensRatio;
+			token1Amount = token2Amount * tokensRatio;
 		}
-	};
+	}
 
-	const onSelectTicker1 = async () => {
+	async function onSelectTicker1() {
 		if (!selectedTicker1 || !$walletConnected) return;
 
 		token1Info = availableTokens[selectedTicker1];
 
 		resetOnNewTickerSelected();
+		let loadedBalance: string | null = await getUserBalance(token1Info);
 
-		let balanceRaw: string | null = await getUserBalance(token1Info);
-
-		if (balanceRaw) {
-			token1Balance = Number(formatNumber(Number(balanceRaw), 5));
+		if (loadedBalance) {
+			token1Balance = Number(loadedBalance);
 		}
 
-		if (!selectedTicker2) return;
+		await loadRatioAndLiquidity();
+	}
 
-		await Promise.all([loadTokenRatio(), loadUserLiquidity()]);
-	};
-
-	const onSelectTicker2 = async () => {
+	async function onSelectTicker2() {
 		if (!selectedTicker2 || !$walletConnected) return;
 
 		token2Info = availableTokens[selectedTicker2];
 
 		resetOnNewTickerSelected();
 
-		let balanceRaw = await getUserBalance(token2Info);
+		let loadedBalance: string | null = await getUserBalance(token2Info);
 
-		if (balanceRaw) {
-			token2Balance = Number(formatNumber(Number(balanceRaw), 5));
+		if (loadedBalance) {
+			token2Balance = Number(loadedBalance);
 		}
 
-		if (!selectedTicker1) return;
+		await loadRatioAndLiquidity();
+	}
 
-		await Promise.all([loadTokenRatio(), loadUserLiquidity()]);
-	};
-
-	const onClickMaxToken1 = () => {
+	function onClickMaxToken1() {
 		token1Amount = token1Balance;
 
 		onTokenInput('token1');
-	};
+	}
 
-	const onClickMaxToken2 = () => {
+	function onClickMaxToken2() {
 		token2Amount = token2Balance;
 
 		onTokenInput('token2');
-	};
+	}
 
+	//**************************************************//
+	//** Page effects **//
+	//**************************************************//
 	// Effects on approve button when user changes his inputs
 	$effect(() => {
 		approveButtonDisabled =
@@ -338,18 +338,25 @@
 	//**************************************************//
 	//** Helper functions **//
 	//**************************************************//
-	function formatNumber(value: number, maxDecimals: number) {
-		const valueString = value.toString();
-		if (valueString.includes('.')) {
-			const [integerPart, decimalPart] = valueString.split('.');
-			if (decimalPart.length > maxDecimals) {
-				return `${integerPart}.${decimalPart.slice(0, maxDecimals)}`;
-			}
-		}
-		return valueString;
+	async function loadRatioAndLiquidity() {
+		if (!token1Info || !token2Info) return;
+
+		if (tokenRatioAbortController) tokenRatioAbortController.abort();
+
+		tokenRatioAbortController = new AbortController();
+		const { signal } = tokenRatioAbortController;
+
+		let [loadedTokenRatio] = await Promise.all([
+			loadTokenRatio(token1Info, token2Info, PUBLIC_DEXER_V2_FACTORY_ADDR),
+			loadUserLiquidity()
+		]);
+
+		if (signal.aborted) return;
+
+		tokensRatio = loadedTokenRatio;
 	}
 
-	const resetOnConfirmed = () => {
+	function resetOnConfirmed() {
 		// Reset ratio
 		tokensRatio = null;
 
@@ -381,26 +388,36 @@
 
 		// Reset pool share
 		userLiquidityData[3].value = '0%';
-	};
 
-	const resetOnNewTickerSelected = () => {
+		token1Balance = 0;
+		token2Balance = 0;
+	}
+
+	function resetOnNewTickerSelected() {
 		// Reset the amount of tokens
 		token2Amount = null;
 		token1Amount = null;
 
 		// Reset ratio as old one is no longer valid
 		tokensRatio = null;
-	};
+	}
 
-	const showSuccessModal = () => {
+	function showSuccessModal() {
 		ModalComponent = SuccessModalContent;
-		isModalOpen = true;
-	};
 
-	const showFailModal = () => {
-		ModalComponent = FailModalContent;
+		modalTitle = 'Success';
+		modalMsg = 'Liquidity added';
+
 		isModalOpen = true;
-	};
+	}
+
+	function showFailModal() {
+		ModalComponent = FailModalContent;
+
+		modalTitle = 'Fail';
+		modalMsg = 'Failed to add liquidity';
+		isModalOpen = true;
+	}
 </script>
 
 <section class="flex flex-col justify-center px-36 pt-32">
@@ -449,6 +466,7 @@
 						}}
 						balance={token1Balance}
 						onClickMax={onClickMaxToken1}
+						checkTheBalance={true}
 					/>
 					<TokenInput
 						bind:selectedTicker={selectedTicker2}
@@ -460,6 +478,7 @@
 						}}
 						balance={token2Balance}
 						onClickMax={onClickMaxToken2}
+						checkTheBalance={true}
 					/>
 				{/if}
 			</div>
@@ -555,7 +574,7 @@
 </section>
 
 <Modal bind:isOpen={isModalOpen}>
-	{#if ModalComponent}
-		<ModalComponent />
+	{#if ModalComponent && modalMsg && modalTitle}
+		<ModalComponent msg={modalMsg} title={modalTitle} />
 	{/if}
 </Modal>

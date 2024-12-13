@@ -78,6 +78,10 @@
 	$effect(() => {
 		filteredTokens = availableTokensList.filter((token) => token !== tickerToExclude);
 	});
+
+	$effect(() => {
+		selectedTokenInfo = selectedTicker ? availableTokens[selectedTicker] : null;
+	});
 </script>
 
 <button

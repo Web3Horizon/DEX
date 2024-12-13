@@ -4,6 +4,7 @@ import { AppError, isAppError } from '$lib/types/AppError';
 import type { TokenInfo } from '$lib/types/tokens/Token';
 import { ethers } from 'ethers';
 import getBrowserProvider from '../helpers/getBrowserProvider';
+import sortTokens from '../tokens/sortTokens';
 
 export const addLiquidity = async (
 	token1Amount: number,
@@ -23,15 +24,24 @@ export const addLiquidity = async (
 		);
 
 		// Convert user input to raw token amounts (on-chain representation)
-		const token1RawAmount = ethers.parseUnits(token1Amount.toString(), token1Info.decimals);
-		const token2RawAmount = ethers.parseUnits(token2Amount.toString(), token2Info.decimals);
+		let token1RawAmount: bigint = ethers.parseUnits(token1Amount.toString(), token1Info.decimals);
+		let token2RawAmount: bigint = ethers.parseUnits(token2Amount.toString(), token2Info.decimals);
 
-		const token1MinAmount =
+		let token1MinAmount: bigint =
 			token1RawAmount -
 			(token1RawAmount * BigInt(Number(PUBLIC_SLIPPAGE_TOLERANCE) * 1e18)) / BigInt(1e18);
-		const token2MinAmount =
+		let token2MinAmount: bigint =
 			token2RawAmount -
 			(token2RawAmount * BigInt(Number(PUBLIC_SLIPPAGE_TOLERANCE) * 1e18)) / BigInt(1e18);
+
+		const [sortedToken0, _] = sortTokens(token1Info.address, token2Info.address);
+
+		if (sortedToken0 === token2Info.address) {
+			[token1Amount, token2Amount] = [token2Amount, token1Amount];
+			[token1Info, token2Info] = [token2Info, token1Info];
+			[token1MinAmount, token2MinAmount] = [token2MinAmount, token1MinAmount];
+			[token1RawAmount, token2RawAmount] = [token2RawAmount, token1RawAmount];
+		}
 
 		const tx = await routerContract.addLiquidity(
 			token1Info.address,
@@ -40,7 +50,7 @@ export const addLiquidity = async (
 			token2RawAmount,
 			token1MinAmount,
 			token2MinAmount,
-			await signer.getAddress()
+			signer.address
 		);
 
 		// Wait for transaction to complete
@@ -51,7 +61,8 @@ export const addLiquidity = async (
 		if (isAppError(e)) {
 			throw e;
 		} else {
-			throw new AppError('Unexpected error occured while adding liquidity:', e.toString());
+			console.error(e);
+			throw new AppError('Unexpected error occured while adding liquidity:', null);
 		}
 	}
 };

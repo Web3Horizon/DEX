@@ -2,11 +2,19 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 
-	let { isOpen = $bindable(false), children, modalContentClass = '' } = $props();
+	let {
+		isOpen = $bindable(false),
+		modalContentClass = '',
+		onClose = () => {},
+		children
+	} = $props();
+
 	let dialog: HTMLDialogElement | null = $state(null);
 
 	const close = () => {
 		isOpen = false;
+
+		onClose();
 	};
 
 	// Listen for the passed in isOpen prop to switch modal state to opeded or
