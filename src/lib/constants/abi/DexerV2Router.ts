@@ -71,6 +71,35 @@ const dexerV2RouterAbi = [
 	},
 	{
 		type: 'function',
+		name: 'getAmountIn',
+		inputs: [
+			{
+				name: 'amountOut',
+				type: 'uint256',
+				internalType: 'uint256'
+			},
+			{
+				name: 'reserveIn',
+				type: 'uint256',
+				internalType: 'uint256'
+			},
+			{
+				name: 'reserveOut',
+				type: 'uint256',
+				internalType: 'uint256'
+			}
+		],
+		outputs: [
+			{
+				name: 'amountIn',
+				type: 'uint256',
+				internalType: 'uint256'
+			}
+		],
+		stateMutability: 'pure'
+	},
+	{
+		type: 'function',
 		name: 'getAmountOut',
 		inputs: [
 			{
@@ -97,6 +126,30 @@ const dexerV2RouterAbi = [
 			}
 		],
 		stateMutability: 'pure'
+	},
+	{
+		type: 'function',
+		name: 'getAmountsIn',
+		inputs: [
+			{
+				name: 'amountOut',
+				type: 'uint256',
+				internalType: 'uint256'
+			},
+			{
+				name: 'path',
+				type: 'address[]',
+				internalType: 'address[]'
+			}
+		],
+		outputs: [
+			{
+				name: 'amountsIn',
+				type: 'uint256[]',
+				internalType: 'uint256[]'
+			}
+		],
+		stateMutability: 'view'
 	},
 	{
 		type: 'function',

@@ -14,5 +14,4 @@
 	<!-- Render all the children, i.e. nested routes -->
 	{@render children()}
 </div>
-
 <Footer></Footer>

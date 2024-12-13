@@ -48,7 +48,7 @@ const dexerV2FactoryAbi = [
 		inputs: [],
 		outputs: [
 			{
-				name: '',
+				name: '_pairs',
 				type: 'address[]',
 				internalType: 'address[]'
 			}

@@ -163,7 +163,8 @@
 		[selectedTicker1, selectedTicker2] = [selectedTicker2, selectedTicker1]; // Switch token tickers
 		[token1Balance, token2Balance] = [token2Balance, token1Balance]; // Switch token balances
 		[token1Info, token2Info] = [token2Info, token1Info]; // Switch token infos
-		[token1Amount, token2Amount] = [token2Amount, token1Amount]; // Switch token amounts
+		token1Amount = null;
+		token2Amount = null;
 
 		if (tokensRatio && tokensRatio !== 0) {
 			tokensRatio = 1 / tokensRatio;
