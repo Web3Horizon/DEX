@@ -35,6 +35,8 @@ export async function fetchAllUserLiquidity(
 				pairContract.getReserves()
 			]);
 
+			if (!addressToTickerMap[token0Addr] || !addressToTickerMap[token1Addr]) continue;
+
 			// Calculate user's pool share
 			const poolShare = (userBalance * 100n) / totalSupply;
 

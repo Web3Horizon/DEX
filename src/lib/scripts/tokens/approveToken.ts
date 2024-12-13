@@ -33,6 +33,7 @@ export async function approveTokens(
 		if (isAppError(e)) {
 			throw e;
 		} else {
+			console.error(e);
 			throw new AppError('Unexpected error occured while approving token:', e.toString());
 		}
 	}

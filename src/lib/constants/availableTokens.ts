@@ -29,13 +29,13 @@ import { TokenTickers, type AvailableTokens } from '$lib/types/tokens/AvailableT
 export const availableTokens: AvailableTokens = {
 	SLV: {
 		ticker: TokenTickers.SLV,
-		address: PUBLIC_TOKEN_B_ADDR,
+		address: PUBLIC_TOKEN_A_ADDR,
 		imgPath: SLV,
 		decimals: Number(PUBLIC_TOKEN_B_DECIMALS)
 	},
 	GLD: {
 		ticker: TokenTickers.GLD,
-		address: PUBLIC_TOKEN_A_ADDR,
+		address: PUBLIC_TOKEN_B_ADDR,
 		imgPath: GLD,
 		decimals: Number(PUBLIC_TOKEN_A_DECIMALS)
 	},
